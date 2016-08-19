@@ -1,10 +1,10 @@
 {
   "name": "npm-module-test",
-  "version": "0.0.0",
-  "description": "module test",
+  "version": "0.0.1",
+  "description": "npm module creation test",
   "homepage": "",
   "author": {
-    "name": "looeee",
+    "name": "Lewy Blue",
     "email": "looeee@gmail.com",
     "url": ""
   },

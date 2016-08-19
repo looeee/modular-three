@@ -4,7 +4,7 @@ const gulp = require('gulp');
 // Javascript testing suite: https://mochajs.org/
 const mocha = require('gulp-mocha');
 
-//Code coverage tool
+// Code coverage tool
 const istanbul = require('gulp-istanbul');
 
 // Test for known node vulnerabilities
@@ -56,6 +56,7 @@ gulp.task('test', ['pre-test'], function (cb) {
 
 gulp.task('watch', function () {
   gulp.watch(['src/**/*.js', 'test/**'], ['test']);
+  gulp.watch(['src/**/*.js'], ['babel']);
 });
 
 gulp.task('coveralls', ['test'], function () {
@@ -67,7 +68,7 @@ gulp.task('coveralls', ['test'], function () {
     .pipe(coveralls());
 });
 
-gulp.task('babel', ['clean'], function () {
+gulp.task('babel', function () {
   return gulp.src('src/**/*.js')
     .pipe(babel())
     .pipe(gulp.dest('dist'));
