@@ -8,6 +8,7 @@
 // (Mesh, Sprite etc.)
 // This can then be added within a drawing with this.scene.add(object)
 // *****************************************************************************
+//TODO: rename this class
 export class Object {
   constructor(spec) {
     this.spec = spec || {};
