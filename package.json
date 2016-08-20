@@ -1,8 +1,10 @@
 {
   "name": "modular-three",
+  "title": "Modular THREE.js",
   "version": "0.0.2",
+  "main": "index.js",
   "description": "THREE.js modular ES2015 setup",
-  "homepage": "",
+  "homepage": "https://github.com/looeee/modular-three",
   "author": {
     "name": "Lewy Blue",
     "email": "looeee@gmail.com",
@@ -13,7 +15,12 @@
   ],
   "main": "dist/index.js",
   "keywords": [
-    ""
+    "THREE",
+    "WebGL",
+    "ES2015",
+    "modular",
+    "es6",
+    "modules"
   ],
   "devDependencies": {
     "babel-core": "^6.11.4",
@@ -42,6 +49,7 @@
     "type": "git",
     "url": "git+https://github.com/looeee/modular-three.git"
   },
+  "bugs": "https://github.com/looeee/modular-three/issues",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
