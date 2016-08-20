@@ -1,23 +1,8 @@
 const path = require('path');
 const gulp = require('gulp');
 
-// Javascript testing suite: https://mochajs.org/
-const mocha = require('gulp-mocha');
-
-// Code coverage tool
-const istanbul = require('gulp-istanbul');
-
-// ES6 coverage  with istanbul
-const isparta = require('isparta');
-
-// Code coverage (test coverage) with https://coveralls.io
-const coveralls = require('gulp-coveralls');
-
 // Test for known node vulnerabilities
 const nsp = require('gulp-nsp');
-
-// Better error handling
-const plumber = require('gulp-plumber');
 
 // ES2015 build related objects
 const babel = require('rollup-plugin-babel');
@@ -26,55 +11,6 @@ const rollupify = require('rollupify');
 const watchify = require('watchify');
 const source = require('vinyl-source-stream');
 const gutil = require('gulp-util');
-
-// allow deleting files / folders
-const del = require('del');
-
-gulp.task('nsp', (cb) => {
-  nsp({
-    package: path.resolve('package.json'),
-  }, cb);
-});
-
-gulp.task('pre-test', () => {
-  return gulp.src('src/**/*.js')
-    .pipe(istanbul({
-      includeUntested: true,
-      instrumenter: isparta.Instrumenter,
-    }))
-    .pipe(istanbul.hookRequire());
-});
-
-gulp.task('test', ['pre-test'], (cb) => {
-  let mochaErr;
-
-  gulp.src('test/**/*.js')
-    .pipe(plumber())
-    .pipe(mocha({
-      reporter: 'spec',
-    }))
-    .on('error', (err) => {
-      mochaErr = err;
-    })
-    .pipe(istanbul.writeReports())
-    .on('end', () => {
-      cb(mochaErr);
-    });
-});
-
-gulp.task('watch', () => {
-  //gulp.watch(['src/**/*.js', 'test/**'], ['test']);
-  gulp.watch(['src/**/*.js'], ['babel']);
-});
-
-gulp.task('coveralls', ['test'], () => {
-  if (!process.env.CI) {
-    return false;
-  }
-
-  return gulp.src(path.join(__dirname, 'coverage/lcov.info'))
-    .pipe(coveralls());
-});
 
 // add custom browserify options here
 const customOpts = {
@@ -116,10 +52,14 @@ b.on('log', gutil.log); // output build logs to terminal
 
 gulp.task('babel', bundle);
 
-// Remove built files
-gulp.task('clean', () => {
-  return del('dist');
+gulp.task('nsp', (cb) => {
+  nsp({
+    package: path.resolve('package.json'),
+  }, cb);
 });
 
-gulp.task('prepublish', ['nsp', 'babel']);
+gulp.task('watch', () => {
+  gulp.watch(['src/**/*.js'], ['babel']);
+});
+
 gulp.task('default', ['watch']);
