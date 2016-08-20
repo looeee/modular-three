@@ -415,6 +415,23 @@ var checkHeartcodeLoaded = function () {
     msg += 'and add <script src="path-to-script/heartcode-canvasloader-min.js">';
     msg += '</script> to your <head>';
     console.error(msg);
+    return false;
+  }
+  return true;
+};
+
+var addLoaderElem = function () {
+  var elem = document.querySelector('#loadingOverlay');
+  if (elem === null) {
+    var loadingOverlay = document.createElement('div');
+    loadingOverlay.id = 'loadingOverlay';
+    loadingOverlay.style = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%;z-index: 999; background-color: black;';
+    var loadingIcon = document.createElement('div');
+    loadingIcon.id = 'loadingIcon';
+    loadingIcon.style = 'position: fixed; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%); }';
+
+    loadingOverlay.appendChild(loadingIcon);
+    document.body.appendChild(loadingOverlay);
   }
 };
 
@@ -431,10 +448,13 @@ var checkStatsLoaded = function () {
 
 var init = function () {
   if (config.useGSAP) checkGSAPLoaded();
+
   if (config.useHeartcodeLoader) {
-    //TODO: automatically add elem for loader
-    checkHeartcodeLoaded();
+    if (checkHeartcodeLoaded()) {
+      addLoaderElem();
+    }
   }
+
   if (config.showStats) checkStatsLoaded();
 };
 
