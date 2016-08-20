@@ -1,6 +1,6 @@
 {
   "name": "npm-module-test",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "npm module creation test",
   "homepage": "",
   "author": {
@@ -40,8 +40,7 @@
   },
   "eslintConfig": {
     "extends": "xo-space",
-    "env": {
-    }
+    "env": {}
   },
   "repository": {
     "type": "git",
