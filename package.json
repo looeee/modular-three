@@ -1,7 +1,7 @@
 {
-  "name": "npm-module-test",
+  "name": "modular-three",
   "version": "0.0.2",
-  "description": "npm module creation test",
+  "description": "THREE.js modular ES2015 setup",
   "homepage": "",
   "author": {
     "name": "Lewy Blue",
@@ -40,7 +40,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/looeee/npm_module_test.git"
+    "url": "git+https://github.com/looeee/modular-three.git"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

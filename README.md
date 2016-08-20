@@ -1,5 +1,5 @@
-# npm-module-test [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url]
-> module test
+# modular-three [![NPM version][npm-image]][npm-url] [![Build Status] [![Dependency Status]
+> This is a very early experimental build of a modular setup for THREE.js that plays well with ES2015.
 
 ## Installation
 
@@ -10,20 +10,14 @@ $ npm install --save npm-module-test
 ## Usage
 
 ```js
-var npmModuleTest = require('npm-module-test');
+var modularTHREE = require('modular-three');
 
-npmModuleTest('Rainbow');
+REST OF USAGE INSTRUCTIONS FORTHCOMING!
 ```
 ## License
 
-MIT © [Lewy Blue]()
+MIT © [Lewy Blue]() 2016
 
 
-[npm-image]: https://badge.fury.io/js/npm-module-test.svg
-[npm-url]: https://npmjs.org/package/npm-module-test
-[travis-image]: https://travis-ci.org/looeee/npm-module-test.svg?branch=master
-[travis-url]: https://travis-ci.org/looeee/npm-module-test
-[daviddm-image]: https://david-dm.org/looeee/npm-module-test.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/looeee/npm-module-test
-[coveralls-image]: https://coveralls.io/repos/looeee/npm-module-test/badge.svg
-[coveralls-url]: https://coveralls.io/r/looeee/npm-module-test
+[npm-image]: https://badge.fury.io/js/modular-three.svg
+[npm-url]: https://npmjs.org/package/modular-three
