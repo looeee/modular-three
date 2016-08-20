@@ -19,8 +19,7 @@ const nsp = require('gulp-nsp');
 // Better error handling
 const plumber = require('gulp-plumber');
 
-// Babel build related objects
-//const rollup = require('gulp-rollup');
+// ES2015 build related objects
 const babel = require('rollup-plugin-babel');
 const browserify = require('browserify');
 const rollupify = require('rollupify');

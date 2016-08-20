@@ -16,7 +16,7 @@ npmModuleTest('Rainbow');
 ```
 ## License
 
-MIT © [looeee]()
+MIT © [Lewy Blue]()
 
 
 [npm-image]: https://badge.fury.io/js/npm-module-test.svg

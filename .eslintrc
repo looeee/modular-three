@@ -15,6 +15,7 @@
     "max-len": ["error", { "code": 120 }],
     "no-fallthrough": ["error", { "commentPattern": "break[\\s\\w]*omitted" }],
     "import/no-extraneous-dependencies": ["error", {"devDependencies": true, "optionalDependencies": false, "peerDependencies": false}],
+    "import/prefer-default-export": 0,
     "linebreak-style": ["error", "windows"]
   }
 }
