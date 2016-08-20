@@ -1,5 +1,7 @@
-# modular-three [![NPM version][npm-image]][npm-url] [![Build Status] [![Dependency Status]
+# modular-three [![NPM version][npm-image]][npm-url]
 > This is a very early experimental build of a modular setup for THREE.js that plays well with ES2015.
+
+#You should not use this yet!! 
 
 ## Installation
 
