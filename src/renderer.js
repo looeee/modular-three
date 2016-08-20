@@ -1,7 +1,7 @@
-import {
-  Postprocessing,
-}
-from './postprocessing';
+// import {
+//   Postprocessing,
+// }
+// from './postprocessing';
 // *****************************************************************************
 // RENDERER CLASS
 //
@@ -91,7 +91,7 @@ export class Renderer {
   render(scene, camera, showStats = false) {
     if (showStats) this.showStats();
     this.renderer.setClearColor(this.spec.clearColor, this.spec.clearAlpha);
-    if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
+    //if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
     this.animate(scene, camera);
   }
 
@@ -103,7 +103,7 @@ export class Renderer {
   animate(scene, camera) {
     this.renderHandler = () => {
       if (this.stats) this.stats.update();
-      if (this.spec.postprocessing) this.postRenderer.composer.render();
+      //if (this.spec.postprocessing) this.postRenderer.composer.render();
       else this.renderer.render(scene, camera);
     };
 

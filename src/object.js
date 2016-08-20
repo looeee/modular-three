@@ -1,7 +1,7 @@
-import {
-  textureLoader,
-}
-from './loaders/textureLoader';
+// import {
+//   textureLoader,
+// }
+// from './loaders/textureLoader';
 // *****************************************************************************
 // OBJECTS SUPERCLASS
 // Objects are used by drawings and each return a THREE.Object3D
@@ -27,7 +27,7 @@ export class Object {
     return mesh;
   }
 
-  loadTexture(url) {
-    return textureLoader(url);
-  }
+  // loadTexture(url) {
+  //   return textureLoader(url);
+  // }
 }

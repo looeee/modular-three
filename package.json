@@ -41,13 +41,14 @@
   "eslintConfig": {
     "extends": "xo-space",
     "env": {
-      "mocha": true
     }
   },
-  "repository": "looeee/npm-module-test",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/looeee/npm-module-test.git"
+  },
   "scripts": {
-    "prepublish": "gulp prepublish",
-    "test": "gulp"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "license": "MIT"
 }
