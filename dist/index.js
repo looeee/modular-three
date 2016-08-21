@@ -9,19 +9,15 @@ var classCallCheck = function (instance, Constructor) {
 // }
 // from './loaders/textureLoader';
 // *****************************************************************************
-// OBJECTS SUPERCLASS
-// Objects are used by drawings and each return a THREE.Object3D
-// (Mesh, Sprite etc.)
-// This can then be added within a drawing with this.scene.add(object)
+// MESH OBJECT SUPERCLASS
+// Superclass for any THREE.js mesh object. Returns a THREE mesh
 // *****************************************************************************
 //TODO: rename this class
-var Object$1 = function () {
-  function Object(spec) {
-    classCallCheck(this, Object);
+var MeshObject = function () {
+  function MeshObject(spec) {
+    classCallCheck(this, MeshObject);
 
     this.spec = spec || {};
-
-    this.spec.color = this.spec.color || 0xffffff;
 
     this.init();
     if (this.spec.layer) {
@@ -31,7 +27,7 @@ var Object$1 = function () {
     return this.mesh;
   }
 
-  Object.prototype.createMesh = function createMesh(geometry, material) {
+  MeshObject.prototype.createMesh = function createMesh(geometry, material) {
     var mesh = new THREE.Mesh(geometry, material);
     return mesh;
   };
@@ -41,7 +37,7 @@ var Object$1 = function () {
   // }
 
 
-  return Object;
+  return MeshObject;
 }();
 
 // import {
@@ -59,10 +55,10 @@ var Object$1 = function () {
 // NOTE: Currently using TweenMax ticker for animation so the gsap files must
 // be included
 //
-// The spec object can be omitted for the following defaults
-// const spec = {
+// The following spec object can be omitted for the following defaults
+// const rendererSpec = {
 //   containerElem: canvasElem, // omit for THREE js default
-//   antialias: true, ,
+//   antialias: true,
 //   alpha: false, //true required for multiple scenes
 //   autoClear: true, //false required for multiple scenes
 //   clearColor: 0x000000,
@@ -141,12 +137,10 @@ var Renderer = function () {
     }
   };
 
-  Renderer.prototype.render = function render(scene, camera) {
-    var showStats = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
-
+  Renderer.prototype.render = function render(scene, camera, showStats) {
     if (showStats) this.showStats();
     this.renderer.setClearColor(this.spec.clearColor, this.spec.clearAlpha);
-    //if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
+    if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
     this.animate(scene, camera);
   };
 
@@ -160,8 +154,7 @@ var Renderer = function () {
 
     this.renderHandler = function () {
       if (_this.stats) _this.stats.update();
-      //if (this.spec.postprocessing) this.postRenderer.composer.render();
-      else _this.renderer.render(scene, camera);
+      if (_this.spec.postprocessing) _this.postRenderer.composer.render();else _this.renderer.render(scene, camera);
     };
 
     TweenLite.ticker.addEventListener('tick', this.renderHandler);
@@ -180,7 +173,7 @@ var Renderer = function () {
 //    type: 'PerspectiveCamera', //Or 'OrthographicCamera'
 //    near: 10,
 //    far: -10,
-//    position: new THREE.Vector3(0, 0, 0),
+//    position: new THREE.Vector3(0, 0, 100),
 //    //PerspectiveCamera only
 //    fov: 45, //PerspectiveCamera only
 //    aspect: window.innerWidth / window.innerHeight,
@@ -192,7 +185,7 @@ var Camera = function () {
   function Camera(spec) {
     classCallCheck(this, Camera);
 
-    this.spec = spec;
+    this.spec = spec || {};
     this.init();
   }
 
@@ -238,12 +231,12 @@ var Camera = function () {
       this.cam.fov = this.spec.fov;
       this.cam.aspect = this.spec.aspect();
     } else {
-      this.cam.left = -this.spec.width / 2;
-      this.cam.right = this.spec.width / 2;
-      this.cam.top = this.spec.height / 2;
-      this.cam.bottom = -this.spec.height / 2;
+      this.cam.left = -this.spec.width() / 2;
+      this.cam.right = this.spec.width() / 2;
+      this.cam.top = this.spec.height() / 2;
+      this.cam.bottom = -this.spec.height() / 2;
     }
-    this.cam.position.copy(this.spec.position());
+    this.cam.position.copy(this.spec.position);
     this.cam.near = this.spec.near;
     this.cam.far = this.spec.far;
     this.cam.updateProjectionMatrix();
@@ -288,7 +281,7 @@ var Scene = function () {
     this.scene.add(this.camera.cam);
 
     //used to add Orbit Controls to the camera
-    this.camera.cam.userData.domElement = this.rendererSpec.containerElem;
+    //this.camera.cam.userData.domElement = this.rendererSpec.containerElem;
 
     this.renderer = new Renderer(this.rendererSpec);
   };
@@ -381,7 +374,7 @@ var config = {
 };
 
 // *****************************************************************************
-// Performs various initialisation checks and setup
+// Perform various initialisation checks and setup
 // *****************************************************************************
 var moduleName = 'unnamedTHREESetupModule';
 //TODO: turn check functions into proper checks
@@ -461,6 +454,6 @@ var init = function () {
 module.exports = {
   init: init,
   config: config,
-  Object: Object$1,
+  MeshObject: MeshObject,
   Drawing: Drawing
 };

@@ -3,17 +3,13 @@
 // }
 // from './loaders/textureLoader';
 // *****************************************************************************
-// OBJECTS SUPERCLASS
-// Objects are used by drawings and each return a THREE.Object3D
-// (Mesh, Sprite etc.)
-// This can then be added within a drawing with this.scene.add(object)
+// MESH OBJECT SUPERCLASS
+// Superclass for any THREE.js mesh object. Returns a THREE mesh
 // *****************************************************************************
 //TODO: rename this class
-export class Object {
+export class MeshObject {
   constructor(spec) {
     this.spec = spec || {};
-
-    this.spec.color = this.spec.color || 0xffffff;
 
     this.init();
     if (this.spec.layer) {

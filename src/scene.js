@@ -28,7 +28,7 @@ export class Scene {
     this.scene.add(this.camera.cam);
 
     //used to add Orbit Controls to the camera
-    this.camera.cam.userData.domElement = this.rendererSpec.containerElem;
+    //this.camera.cam.userData.domElement = this.rendererSpec.containerElem;
 
     this.renderer = new Renderer(this.rendererSpec);
   }

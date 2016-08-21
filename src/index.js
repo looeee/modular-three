@@ -1,7 +1,7 @@
 import {
-  Object,
+  MeshObject,
 }
-from './object';
+from './meshObject';
 
 import {
   Drawing,
@@ -21,6 +21,6 @@ from './config';
 module.exports = {
   init,
   config,
-  Object,
+  MeshObject,
   Drawing,
 };

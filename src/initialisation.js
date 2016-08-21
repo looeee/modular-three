@@ -3,7 +3,7 @@ import {
 }
 from './config';
 // *****************************************************************************
-// Performs various initialisation checks and setup
+// Perform various initialisation checks and setup
 // *****************************************************************************
 const moduleName = 'unnamedTHREESetupModule';
 //TODO: turn check functions into proper checks

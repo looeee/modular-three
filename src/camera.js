@@ -8,7 +8,7 @@
 //    type: 'PerspectiveCamera', //Or 'OrthographicCamera'
 //    near: 10,
 //    far: -10,
-//    position: new THREE.Vector3(0, 0, 0),
+//    position: new THREE.Vector3(0, 0, 100),
 //    //PerspectiveCamera only
 //    fov: 45, //PerspectiveCamera only
 //    aspect: window.innerWidth / window.innerHeight,
@@ -18,7 +18,7 @@
 //  };
 export class Camera {
   constructor(spec) {
-    this.spec = spec;
+    this.spec = spec || {};
     this.init();
   }
 
@@ -59,12 +59,12 @@ export class Camera {
       this.cam.aspect = this.spec.aspect();
     }
     else {
-      this.cam.left = -this.spec.width / 2;
-      this.cam.right = this.spec.width / 2;
-      this.cam.top = this.spec.height / 2;
-      this.cam.bottom = -this.spec.height / 2;
+      this.cam.left = -this.spec.width() / 2;
+      this.cam.right = this.spec.width() / 2;
+      this.cam.top = this.spec.height() / 2;
+      this.cam.bottom = -this.spec.height() / 2;
     }
-    this.cam.position.copy(this.spec.position());
+    this.cam.position.copy(this.spec.position);
     this.cam.near = this.spec.near;
     this.cam.far = this.spec.far;
     this.cam.updateProjectionMatrix();
