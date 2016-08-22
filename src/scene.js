@@ -55,7 +55,7 @@ export class Scene {
     this.renderer.cancelRender();
   }
 
-  render(showStats) {
-    this.renderer.render(this.scene, this.camera.cam, showStats);
+  render() {
+    this.renderer.render(this.scene, this.camera.cam);
   }
 }

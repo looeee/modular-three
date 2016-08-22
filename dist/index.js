@@ -40,6 +40,42 @@ var MeshObject = function () {
   return MeshObject;
 }();
 
+var warnIfConfigUpdatedAfterInit = function () {
+  console.warn('Config setting should be set before calling ModularTHREE.init()');
+};
+
+var config = {
+  initCalled: false,
+
+  GSAP: true,
+  get useGSAP() {
+    return this.GSAP;
+  },
+  set useGSAP(value) {
+    if (this.initCalled) warnIfConfigUpdatedAfterInit();
+    this.GSAP = value;
+  },
+
+  heartcodeLoader: true,
+  get useHeartcodeLoader() {
+    return this.heartcodeLoader;
+  },
+  set useHeartcodeLoader(value) {
+    if (this.initCalled) warnIfConfigUpdatedAfterInit();
+    this.heartcodeLoader = value;
+  },
+
+  stats: true,
+  get showStats() {
+    return this.stats;
+  },
+  set showStats(value) {
+    if (this.initCalled) warnIfConfigUpdatedAfterInit();
+    this.stats = value;
+  }
+};
+
+var showStats = config.showStats;
 // import {
 //   Postprocessing,
 // }
@@ -128,16 +164,12 @@ var Renderer = function () {
   };
 
   Renderer.prototype.showStats = function showStats() {
-    if (typeof Stats === 'function') {
-      if (this.stats) return; //don't create stats more than once
-      this.stats = new Stats();
-      document.body.appendChild(this.stats.dom);
-    } else {
-      console.warn('https://github.com/mrdoob/stats.js must be included for stats to work');
-    }
+    if (this.stats) return; //don't create stats more than once
+    this.stats = new Stats();
+    document.body.appendChild(this.stats.dom);
   };
 
-  Renderer.prototype.render = function render(scene, camera, showStats) {
+  Renderer.prototype.render = function render(scene, camera) {
     if (showStats) this.showStats();
     this.renderer.setClearColor(this.spec.clearColor, this.spec.clearAlpha);
     if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
@@ -153,7 +185,7 @@ var Renderer = function () {
     var _this = this;
 
     this.renderHandler = function () {
-      if (_this.stats) _this.stats.update();
+      if (showStats) _this.stats.update();
       if (_this.spec.postprocessing) _this.postRenderer.composer.render();else _this.renderer.render(scene, camera);
     };
 
@@ -325,8 +357,8 @@ var Scene = function () {
     this.renderer.cancelRender();
   };
 
-  Scene.prototype.render = function render(showStats) {
-    this.renderer.render(this.scene, this.camera.cam, showStats);
+  Scene.prototype.render = function render() {
+    this.renderer.render(this.scene, this.camera.cam);
   };
 
   return Scene;
@@ -374,8 +406,8 @@ var Drawing = function () {
     this.init();
   };
 
-  Drawing.prototype.render = function render(showStats) {
-    this.scene.render(showStats);
+  Drawing.prototype.render = function render() {
+    this.scene.render();
   };
 
   Drawing.prototype.cancelRender = function cancelRender() {
@@ -384,12 +416,6 @@ var Drawing = function () {
 
   return Drawing;
 }();
-
-var config = {
-  useGSAP: true,
-  useHeartcodeLoader: true,
-  showStats: true
-};
 
 // *****************************************************************************
 // Perform various initialisation checks and setup
@@ -454,6 +480,7 @@ var checkStatsLoaded = function () {
     msg += 'and add <script src="path-to-script/stats.min.js">';
     msg += '</script> to your <head>';
     console.error(msg);
+    config.showStats = false;
   }
 };
 
@@ -467,6 +494,8 @@ var init = function () {
   }
 
   if (config.showStats) checkStatsLoaded();
+
+  config.initCalled = true;
 };
 
 module.exports = {

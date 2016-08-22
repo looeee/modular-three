@@ -1,3 +1,9 @@
+import {
+  config,
+}
+from './config';
+
+const showStats = config.showStats;
 // import {
 //   Postprocessing,
 // }
@@ -78,17 +84,12 @@ export class Renderer {
   }
 
   showStats() {
-    if (typeof Stats === 'function') {
-      if (this.stats) return; //don't create stats more than once
-      this.stats = new Stats();
-      document.body.appendChild(this.stats.dom);
-    }
-    else {
-      console.warn('https://github.com/mrdoob/stats.js must be included for stats to work');
-    }
+    if (this.stats) return; //don't create stats more than once
+    this.stats = new Stats();
+    document.body.appendChild(this.stats.dom);
   }
 
-  render(scene, camera, showStats) {
+  render(scene, camera) {
     if (showStats) this.showStats();
     this.renderer.setClearColor(this.spec.clearColor, this.spec.clearAlpha);
     if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
@@ -102,7 +103,7 @@ export class Renderer {
 
   animate(scene, camera) {
     this.renderHandler = () => {
-      if (this.stats) this.stats.update();
+      if (showStats) this.stats.update();
       if (this.spec.postprocessing) this.postRenderer.composer.render();
       else this.renderer.render(scene, camera);
     };

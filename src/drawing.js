@@ -6,7 +6,7 @@ import {
 from './scene';
 
 //hold a reference to all drawings so that they can be reset easily
-export const drawings = {};
+const drawings = {};
 
 const resetDrawings = () => {
   Object.keys(drawings)
@@ -44,8 +44,8 @@ export class Drawing {
     this.init();
   }
 
-  render(showStats) {
-    this.scene.render(showStats);
+  render() {
+    this.scene.render();
   }
 
   cancelRender() {

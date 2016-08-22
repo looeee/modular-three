@@ -1,4 +1,3 @@
-
 import {
   config,
 }
@@ -66,6 +65,7 @@ const checkStatsLoaded = () => {
     msg += 'and add <script src="path-to-script/stats.min.js">';
     msg += '</script> to your <head>';
     console.error(msg);
+    config.showStats = false;
   }
 };
 
@@ -79,4 +79,6 @@ export const init = () => {
   }
 
   if (config.showStats) checkStatsLoaded();
+
+  config.initCalled = true;
 };
