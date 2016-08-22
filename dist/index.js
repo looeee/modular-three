@@ -332,6 +332,21 @@ var Scene = function () {
   return Scene;
 }();
 
+var throttle = require('lodash.throttle');
+
+//hold a reference to all drawings so that they can be reset easily
+var drawings = {};
+
+var resetDrawings = function () {
+  Object.keys(drawings).forEach(function (key) {
+    drawings[key].reset();
+  });
+};
+
+window.addEventListener('resize', throttle(function () {
+  resetDrawings();
+}, 500), false);
+
 // *****************************************************************************
 //
 //  DRAWING CLASS
@@ -343,7 +358,10 @@ var Drawing = function () {
 
     this.scene = new Scene(cameraSpec, rendererSpec);
     this.camera = this.scene.camera;
+
     this.uuid = THREE.Math.generateUUID();
+    drawings[this.uuid] = this;
+
     this.init();
   }
 

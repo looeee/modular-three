@@ -2,7 +2,7 @@
   "name": "modular-three",
   "title": "Modular THREE.js",
   "version": "0.0.2",
-  "main": "index.js",
+  "main": "dist/index.js",
   "description": "THREE.js modular ES2015 setup",
   "homepage": "https://github.com/looeee/modular-three",
   "author": {
@@ -13,7 +13,6 @@
   "files": [
     "dist"
   ],
-  "main": "dist/index.js",
   "keywords": [
     "THREE",
     "WebGL",
@@ -37,6 +36,9 @@
     "gulp-eslint": "^2.0.0",
     "gulp-line-ending-corrector": "^1.0.1",
     "gulp-nsp": "^2.1.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-util": "^3.0.7",
+    "lodash.throttle": "^4.1.1",
     "rollup-plugin-babel": "^2.6.1",
     "rollup-stream": "^1.11.0",
     "vinyl-source-stream": "^1.1.0"

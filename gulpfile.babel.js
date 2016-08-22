@@ -1,6 +1,9 @@
 const path = require('path');
 const gulp = require('gulp');
 
+// const gutil = require('gulp-util');
+// const plumber = require('gulp-plumber');
+
 // Test for known node vulnerabilities
 const nsp = require('gulp-nsp');
 
@@ -20,8 +23,16 @@ function bundle() {
       }),
     ],
   })
-  .pipe(source('index.js'))
-  .pipe(gulp.dest('dist/'));
+    //.pipe(gutil.log())
+    //.on('error', gutil.log)
+    // .pipe(plumber({
+    //   handleError: (err) => {
+    //     console.log(err);
+    //     this.emit('end');
+    //   },
+    // }))
+    .pipe(source('index.js'))
+    .pipe(gulp.dest('dist/'));
 }
 
 gulp.task('nsp', (cb) => {
