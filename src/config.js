@@ -14,7 +14,7 @@ export const config = {
     this.heartcodeLoader = value;
   },
 
-  stats: false,
+  stats: true,
   get showStats() {
     return this.stats;
   },

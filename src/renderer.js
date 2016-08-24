@@ -53,12 +53,24 @@ export class Renderer {
     };
 
     if (this.spec.canvasID) {
-      rendererOptions.canvas = document.createElement('canvas');
-      rendererOptions.canvas.id = this.spec.canvasID;
+      if (document.querySelector(`#${this.spec.canvasID}`)) {
+        let msg = `Warning: an element with id ${this.spec.canvasID} already exists \n`;
+        msg += 'Perhaps it was created manually? This will cause problems if you are';
+        msg += 'trying to render multiple Drawings to the same <canvas> element.';
+        console.warn(msg);
+        rendererOptions.canvas = document.querySelector(`#${this.spec.canvasID}`);
+      }
+      else if (this.spec.canvasID) {
+        rendererOptions.canvas = document.createElement('canvas');
+        rendererOptions.canvas.id = this.spec.canvasID;
+      }
     }
 
     this.renderer = new THREE.WebGLRenderer(rendererOptions);
-    document.body.appendChild(this.renderer.domElement);
+
+    if (!this.spec.canvasID || !document.querySelector(`#${this.renderer.domElement.id}`)) {
+      document.body.appendChild(this.renderer.domElement);
+    }
   }
 
   initParams() {
