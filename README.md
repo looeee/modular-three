@@ -259,10 +259,10 @@ Your ```Drawing``` should now look pretty similar to the spinning cube example.
 
 #### Using [**GSAP**](http://greensock.com/gsap) for Animation ####
 
-The above is fine for simple animations, however things will get quite messy if you are trying to do anything complex. To switch to using [**GSAP**](http://greensock.com/gsap) to handle animations, set ```rendererSpec.useGSAP = true```. If you have correctly included the GSAP script,
+The above is fine for simple animations, however things will get messy quickly if you are trying to do anything complex. To switch to using [**GSAP**](http://greensock.com/gsap) to handle animations, set ```rendererSpec.useGSAP = true```. If you have correctly included the GSAP script,
 everything should be the same - the code will spin exactly as before, however you can now create GSAP timelines and tweens in your ```Drawing```.
 
-A deep exploration of GSAP is beyond the scope of this Readme, however the GSAP [**documentation**](https://greensock.com/docs) is thorough and [**this is a good place to start**](https://greensock.com/get-started-js). But let's add create a simple falling animation for our cube using ```Timeline``` and ```TweenMax```. Extend your ```TestDrawing``` function like so:
+A deep exploration of GSAP is beyond the scope of this Readme, however the GSAP [**documentation**](https://greensock.com/docs) is thorough and [**this is a good place to start**](https://greensock.com/get-started-js). But let's create a simple falling animation for our cube using ```Timeline``` and ```TweenMax```. Extend your ```TestDrawing``` function like so:
 
 ```js
 initObjects() {
