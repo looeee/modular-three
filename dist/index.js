@@ -1,13 +1,98 @@
+var warnIfConfigUpdatedAfterInit = function () {
+  console.warn('Config setting should be set before calling ModularTHREE.init()');
+};
+
+var config = {
+  initCalled: false,
+
+  heartcodeLoader: false,
+  get showHeartcodeLoader() {
+    return this.heartcodeLoader;
+  },
+  set showHeartcodeLoader(value) {
+    if (this.initCalled) warnIfConfigUpdatedAfterInit();
+    this.heartcodeLoader = value;
+  },
+
+  stats: false,
+  get showStats() {
+    return this.stats;
+  },
+  set showStats(value) {
+    if (this.initCalled) warnIfConfigUpdatedAfterInit();
+    this.stats = value;
+  }
+};
+
+// *****************************************************************************
+//  LOADING MANAGER
+//  To be used by all other loaders
+// *****************************************************************************
+var loadingOverlay = void 0;
+var loadingIcon = void 0;
+
+var addLoaderElem = function () {
+  loadingOverlay = document.createElement('div');
+  loadingOverlay.id = 'loadingOverlay';
+  loadingOverlay.style = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%;z-index: 999; background-color: black;';
+  loadingIcon = document.createElement('div');
+  loadingIcon.id = 'loadingIcon';
+  loadingIcon.style = 'position: fixed; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%); }';
+
+  loadingOverlay.appendChild(loadingIcon);
+  document.body.appendChild(loadingOverlay);
+};
+
+var initHeartcodeLoader = function () {
+  addLoaderElem();
+  loadingIcon = new CanvasLoader('loadingIcon');
+  loadingIcon.setColor('#5a6f70');
+  loadingIcon.setShape('spiral'); // default is 'oval'
+  loadingIcon.setDiameter(150); // default is 40
+  loadingIcon.setDensity(50); // default is 40
+  loadingIcon.setRange(0.7); // default is 1.3
+  loadingIcon.setSpeed(1); // default is 2
+  loadingIcon.setFPS(30); // default is 24
+  loadingIcon.show(); // Hidden by default
+};
+
+var loadingManager = new THREE.LoadingManager();
+
+loadingManager.onLoad = function () {
+  if (loadingIcon) {
+    loadingIcon.hide();
+    TweenLite.to(loadingOverlay, 2, {
+      opacity: 0,
+      onComplete: function () {
+        return loadingOverlay.classList.add('hide');
+      }
+    });
+  }
+};
+
+// *****************************************************************************
+//  Texture Loader
+//  includes simple memoization to ensure
+//  THREE.TextureLoader() and textures are only loaded once
+// *****************************************************************************
+var loader = null;
+
+var textures = {};
+
+function textureLoader(url) {
+  if (!loader) loader = new THREE.TextureLoader(loadingManager);
+
+  if (!textures[url]) textures[url] = loader.load(url);
+
+  return textures[url];
+}
+
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
   }
 };
 
-// import {
-//   textureLoader,
-// }
-// from './loaders/textureLoader';
 // *****************************************************************************
 // MESH OBJECT SUPERCLASS
 // Superclass for any THREE.js mesh object. Returns a THREE mesh
@@ -27,53 +112,16 @@ var MeshObject = function () {
     return this.mesh;
   }
 
-  MeshObject.prototype.createMesh = function createMesh(geometry, material) {
-    var mesh = new THREE.Mesh(geometry, material);
-    return mesh;
+  MeshObject.prototype.loadTexture = function loadTexture(url) {
+    return textureLoader(url);
   };
 
-  // loadTexture(url) {
-  //   return textureLoader(url);
-  // }
-
+  MeshObject.prototype.updateTexture = function updateTexture(url) {
+    //TODO: implement this
+  };
 
   return MeshObject;
 }();
-
-var warnIfConfigUpdatedAfterInit = function () {
-  console.warn('Config setting should be set before calling ModularTHREE.init()');
-};
-
-var config = {
-  initCalled: false,
-
-  GSAP: true,
-  get useGSAP() {
-    return this.GSAP;
-  },
-  set useGSAP(value) {
-    if (this.initCalled) warnIfConfigUpdatedAfterInit();
-    this.GSAP = value;
-  },
-
-  heartcodeLoader: true,
-  get useHeartcodeLoader() {
-    return this.heartcodeLoader;
-  },
-  set useHeartcodeLoader(value) {
-    if (this.initCalled) warnIfConfigUpdatedAfterInit();
-    this.heartcodeLoader = value;
-  },
-
-  stats: true,
-  get showStats() {
-    return this.stats;
-  },
-  set showStats(value) {
-    if (this.initCalled) warnIfConfigUpdatedAfterInit();
-    this.stats = value;
-  }
-};
 
 var showStats = config.showStats;
 // import {
@@ -114,20 +162,25 @@ var Renderer = function () {
 
   Renderer.prototype.init = function init() {
     this.initParams();
+    this.initRenderer();
+
+    this.setRenderer();
+  };
+
+  Renderer.prototype.initRenderer = function initRenderer() {
     var rendererOptions = {
       antialias: this.spec.antialias,
       //required for multiple scenes and various other effects
       alpha: this.spec.alpha
     };
-    if (this.spec.containerElem) {
-      rendererOptions.canvas = this.spec.containerElem;
-      this.renderer = new THREE.WebGLRenderer(rendererOptions);
-    } else {
-      this.renderer = new THREE.WebGLRenderer(rendererOptions);
-      document.body.appendChild(this.renderer.domElement);
+
+    if (this.spec.canvasID) {
+      rendererOptions.canvas = document.createElement('canvas');
+      rendererOptions.canvas.id = this.spec.canvasID;
     }
 
-    this.setRenderer();
+    this.renderer = new THREE.WebGLRenderer(rendererOptions);
+    document.body.appendChild(this.renderer.domElement);
   };
 
   Renderer.prototype.initParams = function initParams() {
@@ -169,27 +222,67 @@ var Renderer = function () {
     document.body.appendChild(this.stats.dom);
   };
 
-  Renderer.prototype.render = function render(scene, camera) {
+  Renderer.prototype.render = function render(scene, camera, perFrameFunctions) {
     if (showStats) this.showStats();
-    this.renderer.setClearColor(this.spec.clearColor, this.spec.clearAlpha);
     if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
-    this.animate(scene, camera);
+
+    if (this.spec.useGSAP && this.checkGSAPScriptLoaded()) {
+      this.animateWithGSAP(scene, camera, perFrameFunctions);
+    } else {
+      this.animateWithTHREE(scene, camera, perFrameFunctions);
+    }
   };
 
-  Renderer.prototype.cancelRender = function cancelRender() {
-    TweenLite.ticker.removeEventListener('tick', this.renderHandler);
-    this.renderer.clear();
-  };
-
-  Renderer.prototype.animate = function animate(scene, camera) {
+  Renderer.prototype.animateWithGSAP = function animateWithGSAP(scene, camera, perFrameFunctions) {
     var _this = this;
 
-    this.renderHandler = function () {
+    var renderHandler = function () {
+      for (var i = 0; i < perFrameFunctions.length; i++) {
+        perFrameFunctions[i]();
+      }
+
       if (showStats) _this.stats.update();
       if (_this.spec.postprocessing) _this.postRenderer.composer.render();else _this.renderer.render(scene, camera);
     };
 
-    TweenLite.ticker.addEventListener('tick', this.renderHandler);
+    TweenLite.ticker.addEventListener('tick', renderHandler);
+    this.usingGSAP = true;
+  };
+
+  Renderer.prototype.animateWithTHREE = function animateWithTHREE(scene, camera, perFrameFunctions) {
+    var _this2 = this;
+
+    var renderHandler = function () {
+      for (var i = 0; i < perFrameFunctions.length; i++) {
+        perFrameFunctions[i]();
+      }
+
+      if (showStats) _this2.stats.update();
+      if (_this2.spec.postprocessing) _this2.postRenderer.composer.render();else _this2.renderer.render(scene, camera);
+
+      _this2.animationFrame = requestAnimationFrame(renderHandler);
+    };
+
+    renderHandler();
+  };
+
+  Renderer.prototype.cancelRender = function cancelRender() {
+    if (this.usingGSAP) TweenLite.ticker.removeEventListener('tick', this.renderHandler);else cancelAnimationFrame(this.animationFrame);
+    this.renderer.clear();
+    this.usingGSAP = false;
+  };
+
+  Renderer.prototype.checkGSAPScriptLoaded = function checkGSAPScriptLoaded() {
+    if (typeof TweenLite === 'undefined') {
+      var msg = 'ModularTHREE Error: GSAP not loaded.\n';
+      msg += 'Attempting to use THREE for animation.\n';
+      msg += 'If you do not wish to use GSAP set rendererSpec.useGSAP = false\n';
+      msg += 'Otherwise try adding <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js">';
+      msg += '</script> to your <head>';
+      console.error(msg);
+      return false;
+    }
+    return true;
   };
 
   return Renderer;
@@ -296,11 +389,11 @@ var Camera = function () {
 //
 // *****************************************************************************
 var Scene = function () {
-  function Scene(cameraSpec, rendererSpec) {
+  function Scene(rendererSpec, cameraSpec) {
     classCallCheck(this, Scene);
 
-    this.cameraSpec = cameraSpec;
     this.rendererSpec = rendererSpec;
+    this.cameraSpec = cameraSpec;
     this.init();
   }
 
@@ -350,8 +443,8 @@ var Scene = function () {
     this.renderer.cancelRender();
   };
 
-  Scene.prototype.render = function render() {
-    this.renderer.render(this.scene, this.camera.cam);
+  Scene.prototype.render = function render(perFrameFunctions) {
+    this.renderer.render(this.scene, this.camera.cam, perFrameFunctions);
   };
 
   return Scene;
@@ -378,14 +471,16 @@ window.addEventListener('resize', throttle(function () {
 //
 // *****************************************************************************
 var Drawing = function () {
-  function Drawing(cameraSpec, rendererSpec) {
+  function Drawing(rendererSpec, cameraSpec) {
     classCallCheck(this, Drawing);
 
-    this.scene = new Scene(cameraSpec, rendererSpec);
+    this.scene = new Scene(rendererSpec, cameraSpec);
     this.camera = this.scene.camera;
 
     this.uuid = THREE.Math.generateUUID();
     drawings[this.uuid] = this;
+
+    this.perFrameFunctions = [];
 
     this.init();
   }
@@ -400,7 +495,7 @@ var Drawing = function () {
   };
 
   Drawing.prototype.render = function render() {
-    this.scene.render();
+    this.scene.render(this.perFrameFunctions);
   };
 
   Drawing.prototype.cancelRender = function cancelRender() {
@@ -426,16 +521,6 @@ var checkTHREELoaded = function () {
 
 checkTHREELoaded();
 
-var checkGSAPLoaded = function () {
-  if (typeof TweenLite === 'undefined') {
-    var msg = moduleName + ' Error: GSAP not loaded.\n';
-    msg += 'If you do not wish to use GSAP set ' + moduleName + '.config.useGSAP = false\n';
-    msg += 'Otherwise try adding <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js">';
-    msg += '</script> to your <head>';
-    console.error(msg);
-  }
-};
-
 var checkHeartcodeLoaded = function () {
   if (typeof CanvasLoader === 'undefined') {
     var msg = moduleName + ' Error: HeartcodeLoader not loaded.\n';
@@ -448,21 +533,6 @@ var checkHeartcodeLoaded = function () {
     return false;
   }
   return true;
-};
-
-var addLoaderElem = function () {
-  var elem = document.querySelector('#loadingOverlay');
-  if (elem === null) {
-    var loadingOverlay = document.createElement('div');
-    loadingOverlay.id = 'loadingOverlay';
-    loadingOverlay.style = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%;z-index: 999; background-color: black;';
-    var loadingIcon = document.createElement('div');
-    loadingIcon.id = 'loadingIcon';
-    loadingIcon.style = 'position: fixed; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%); }';
-
-    loadingOverlay.appendChild(loadingIcon);
-    document.body.appendChild(loadingOverlay);
-  }
 };
 
 var checkStatsLoaded = function () {
@@ -478,11 +548,9 @@ var checkStatsLoaded = function () {
 };
 
 var init = function () {
-  if (config.useGSAP) checkGSAPLoaded();
-
-  if (config.useHeartcodeLoader) {
+  if (config.showHeartcodeLoader) {
     if (checkHeartcodeLoaded()) {
-      addLoaderElem();
+      initHeartcodeLoader();
     }
   }
 

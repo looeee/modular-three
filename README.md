@@ -61,16 +61,147 @@ before calling ```modularTHREE.init();``` and include
 Usage
 ------
 
-To see it in action clone [**Modular THREE Boilerplate**](https://github.com/looeee/modular-three-boilerplate)
-and have a look through the code there, especially:
-* ```src/entry.js```
-* ```src/drawing/testDrawing.js```
-* ```src/meshObjects/cube.js```
-
-Include Modular THREE at the start of any files that use it like so:
+First include Modular THREE at the start of any files that use it like so:
 ```js
 const modularTHREE = require('modular-three');
 ```
+
+#### Optional
+Set any config options and call ```modularTHREE.init()```. Note: ```init()``` only needs to be
+called if you have changed any config defaults:
+```js
+//The following are the config defaults, only call init if you have changed these
+modularTHREE.config.showStats = false;
+modularTHREE.config.useGSAP = false;
+modularTHREE.config.showHeartcodeLoader = false;
+
+modularTHREE.init();
+```
+
+#### Creating a drawing ####
+
+The first step in using modularTHREE is to create a Drawing, which has a
+```THREE.Scene```, ```THREE.Camera``` and ```THREE.Renderer``` associated with
+a unique ```<canvas>``` element.
+
+Create a class that extends ```modularTHREE.Drawing```:
+
+```js
+class ExampleDrawing extends modularTHREE.Drawing {
+  constructor(rendererSpec, cameraSpec) {
+    super(rendererSpec, cameraSpec);
+  }
+
+  init() {
+    //Code for creating objects and adding them to the scene goes here
+    //The drawing is reset (all objects removed) and init() is called again
+    //on screen resize (throttled using lodash.throttle to once per 500ms),
+    //or you can call ExampleDrawing.reset() to do this manually.
+  }
+}
+```
+
+Then instantiate your ```Drawing``` and call it's ```render()``` function.
+```js
+const exampleDrawing = new ExampleDrawing();
+//If you are passing in a rendererSpec, cameraSpec do this instead:
+//const exampleDrawing = new ExampleDrawing(rendererSpec, cameraSpec);
+
+exampleDrawing.render();
+}
+```
+
+That's it! In just a couple of lines of code you should now have a (blank)
+scene, which is fullscreen with a black background.
+
+#### ```rendererSpec``` and ```cameraSpec```
+For more control you can create ```rendererSpec``` and ```cameraSpec``` objects,
+which have following options. If they are omitted the defaults shown will be used:
+
+```js
+const rendererSpec = {
+  //unique canvasID required for multiple scenes
+  canvasID: '', //TODO: add this functionality, including check that ID is unique
+  antialias: true,
+  alpha: true, //true required for multiple scenes
+  autoClear: true, //false required for multiple scenes
+  clearColor: 0x000000,
+  clearAlpha: 0,
+  width: () => window.innerWidth,
+  height: () => window.innerHeight,
+  pixelRatio: window.devicePixelRatio,
+  postprocessing: false,
+};
+```
+
+Note that ```canvasID```, ```alpha``` and ```autoClear``` **are** required if you are
+using multiple scenes. If ```canvasID``` is omitted a default ```<canvas>``` element
+will be created, and while it is possible to render more than one WebGL scene to a
+single ```<canvas>``` element, this does not appear to have any performance benefits
+and results in more complicated code so that approach is not used here.
+
+```js
+const cameraSpec = {
+  type: 'PerspectiveCamera', //Or 'OrthographicCamera'
+  near: 10,
+  far: -10,
+  position: new THREE.Vector3(0, 0, 100),
+  //PerspectiveCamera only
+  fov: 45, //PerspectiveCamera only
+  aspect: () => window.innerWidth / window.innerHeight,
+  // OrthographicCamera only
+  width: () => window.innerWidth,
+  height: () => window.innerHeight,
+};
+```
+
+Note also that ```width```, ```height``` and ```aspect``` are passed in as functions.
+This is because they are generally based on window dimensions, and this approach allows
+them to be recalculated on window resize.
+
+#### Adding Objects to the Drawing ####
+ModularTHREE currently provides the MeshObject class, which memoizes texture loading
+(so that textures are not reloaded when the scene is reset, for example on window resize)
+and interfaces with the [THREE.LoadingManager](http://threejs.org/docs/?q=loading#Reference/Loaders/LoadingManager),
+which can be used to provide a loading overlay, using for example  [**HeartcodeLoader**](https://github.com/heartcode/CanvasLoader),
+or you own custom loader.
+
+MeshObjects can be created like so:
+
+```js
+class Cube extends modularTHREE.MeshObject {
+  constructor(spec) {
+    super(spec);
+  }
+
+  init() {
+    const geometry = new THREE.BoxGeometry(5, 5, 5);
+    const material = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
+    this.mesh = new THREE.Mesh(geometry, material);
+  }
+}
+```
+
+Again the spec here is optional, but can be used to pass in variables such as material,
+dimension etc.
+
+Next, update the ```init()``` function of your ```Drawing``` class to instantiate the cube.
+
+```js
+class ExampleDrawing extends modularTHREE.Drawing {
+  constructor(rendererSpec, cameraSpec) {
+    super(rendererSpec, cameraSpec);
+  }
+
+  init() {
+    const cube = new Cube();
+    this.scene.add(cube);
+  }
+}
+```
+
+And that's it! You should now have a small red cube in the middle of a black screen.
+
 
 #### License MIT © Lewy Blue 2016 ####
 

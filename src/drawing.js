@@ -27,12 +27,14 @@ false);
 //
 // *****************************************************************************
 export class Drawing {
-  constructor(cameraSpec, rendererSpec) {
-    this.scene = new Scene(cameraSpec, rendererSpec);
+  constructor(rendererSpec, cameraSpec) {
+    this.scene = new Scene(rendererSpec, cameraSpec);
     this.camera = this.scene.camera;
 
     this.uuid = THREE.Math.generateUUID();
     drawings[this.uuid] = this;
+
+    this.perFrameFunctions = [];
 
     this.init();
   }
@@ -45,7 +47,7 @@ export class Drawing {
   }
 
   render() {
-    this.scene.render();
+    this.scene.render(this.perFrameFunctions);
   }
 
   cancelRender() {

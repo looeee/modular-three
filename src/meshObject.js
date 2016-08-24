@@ -1,7 +1,7 @@
-// import {
-//   textureLoader,
-// }
-// from './loaders/textureLoader';
+import {
+  textureLoader,
+}
+from './loaders/textureLoader';
 // *****************************************************************************
 // MESH OBJECT SUPERCLASS
 // Superclass for any THREE.js mesh object. Returns a THREE mesh
@@ -19,12 +19,11 @@ export class MeshObject {
     return this.mesh;
   }
 
-  createMesh(geometry, material) {
-    const mesh = new THREE.Mesh(geometry, material);
-    return mesh;
+  loadTexture(url) {
+    return textureLoader(url);
   }
 
-  // loadTexture(url) {
-  //   return textureLoader(url);
-  // }
+  updateTexture(url) {
+    //TODO: implement this
+  }
 }

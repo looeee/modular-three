@@ -2,6 +2,10 @@ import {
   config,
 }
 from './config';
+import {
+  initHeartcodeLoader,
+}
+from './loaders/loadingManager';
 // *****************************************************************************
 // Perform various initialisation checks and setup
 // *****************************************************************************
@@ -18,16 +22,6 @@ const checkTHREELoaded = () => {
 
 checkTHREELoaded();
 
-const checkGSAPLoaded = () => {
-  if (typeof TweenLite === 'undefined') {
-    let msg = `${moduleName} Error: GSAP not loaded.\n`;
-    msg += `If you do not wish to use GSAP set ${moduleName}.config.useGSAP = false\n`;
-    msg += 'Otherwise try adding <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js">';
-    msg += '</script> to your <head>';
-    console.error(msg);
-  }
-};
-
 const checkHeartcodeLoaded = () => {
   if (typeof CanvasLoader === 'undefined') {
     let msg = `${moduleName} Error: HeartcodeLoader not loaded.\n`;
@@ -40,21 +34,6 @@ const checkHeartcodeLoaded = () => {
     return false;
   }
   return true;
-};
-
-const addLoaderElem = () => {
-  const elem = document.querySelector('#loadingOverlay');
-  if (elem === null) {
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.id = 'loadingOverlay';
-    loadingOverlay.style = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%;z-index: 999; background-color: black;';
-    const loadingIcon = document.createElement('div');
-    loadingIcon.id = 'loadingIcon';
-    loadingIcon.style = 'position: fixed; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%); }';
-
-    loadingOverlay.appendChild(loadingIcon);
-    document.body.appendChild(loadingOverlay);
-  }
 };
 
 const checkStatsLoaded = () => {
@@ -70,11 +49,9 @@ const checkStatsLoaded = () => {
 };
 
 export const init = () => {
-  if (config.useGSAP) checkGSAPLoaded();
-
-  if (config.useHeartcodeLoader) {
+  if (config.showHeartcodeLoader) {
     if (checkHeartcodeLoaded()) {
-      addLoaderElem();
+      initHeartcodeLoader();
     }
   }
 

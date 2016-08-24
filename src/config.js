@@ -4,26 +4,17 @@ const warnIfConfigUpdatedAfterInit = () => {
 
 export const config = {
   initCalled: false,
-  
-  GSAP: true,
-  get useGSAP() {
-    return this.GSAP;
-  },
-  set useGSAP(value) {
-    if (this.initCalled) warnIfConfigUpdatedAfterInit();
-    this.GSAP = value;
-  },
 
-  heartcodeLoader: true,
-  get useHeartcodeLoader() {
+  heartcodeLoader: false,
+  get showHeartcodeLoader() {
     return this.heartcodeLoader;
   },
-  set useHeartcodeLoader(value) {
+  set showHeartcodeLoader(value) {
     if (this.initCalled) warnIfConfigUpdatedAfterInit();
     this.heartcodeLoader = value;
   },
 
-  stats: true,
+  stats: false,
   get showStats() {
     return this.stats;
   },

@@ -13,9 +13,9 @@ from './camera';
 //
 // *****************************************************************************
 export class Scene {
-  constructor(cameraSpec, rendererSpec) {
-    this.cameraSpec = cameraSpec;
+  constructor(rendererSpec, cameraSpec) {
     this.rendererSpec = rendererSpec;
+    this.cameraSpec = cameraSpec;
     this.init();
   }
 
@@ -48,7 +48,7 @@ export class Scene {
     this.renderer.cancelRender();
   }
 
-  render() {
-    this.renderer.render(this.scene, this.camera.cam);
+  render(perFrameFunctions) {
+    this.renderer.render(this.scene, this.camera.cam, perFrameFunctions);
   }
 }

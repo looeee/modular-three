@@ -40,21 +40,25 @@ export class Renderer {
 
   init() {
     this.initParams();
+    this.initRenderer();
+
+    this.setRenderer();
+  }
+
+  initRenderer() {
     const rendererOptions = {
       antialias: this.spec.antialias,
       //required for multiple scenes and various other effects
       alpha: this.spec.alpha,
     };
-    if (this.spec.containerElem) {
-      rendererOptions.canvas = this.spec.containerElem;
-      this.renderer = new THREE.WebGLRenderer(rendererOptions);
-    }
-    else {
-      this.renderer = new THREE.WebGLRenderer(rendererOptions);
-      document.body.appendChild(this.renderer.domElement);
+
+    if (this.spec.canvasID) {
+      rendererOptions.canvas = document.createElement('canvas');
+      rendererOptions.canvas.id = this.spec.canvasID;
     }
 
-    this.setRenderer();
+    this.renderer = new THREE.WebGLRenderer(rendererOptions);
+    document.body.appendChild(this.renderer.domElement);
   }
 
   initParams() {
@@ -89,25 +93,66 @@ export class Renderer {
     document.body.appendChild(this.stats.dom);
   }
 
-  render(scene, camera) {
+  render(scene, camera, perFrameFunctions) {
     if (showStats) this.showStats();
-    this.renderer.setClearColor(this.spec.clearColor, this.spec.clearAlpha);
     if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
-    this.animate(scene, camera);
+
+    if (this.spec.useGSAP && this.checkGSAPScriptLoaded()) {
+      this.animateWithGSAP(scene, camera, perFrameFunctions);
+    }
+    else {
+      this.animateWithTHREE(scene, camera, perFrameFunctions);
+    }
   }
 
-  cancelRender() {
-    TweenLite.ticker.removeEventListener('tick', this.renderHandler);
-    this.renderer.clear();
-  }
+  animateWithGSAP(scene, camera, perFrameFunctions) {
+    const renderHandler = () => {
+      for (let i = 0; i < perFrameFunctions.length; i++) {
+        perFrameFunctions[i]();
+      }
 
-  animate(scene, camera) {
-    this.renderHandler = () => {
       if (showStats) this.stats.update();
       if (this.spec.postprocessing) this.postRenderer.composer.render();
       else this.renderer.render(scene, camera);
     };
 
-    TweenLite.ticker.addEventListener('tick', this.renderHandler);
+    TweenLite.ticker.addEventListener('tick', renderHandler);
+    this.usingGSAP = true;
+  }
+
+  animateWithTHREE(scene, camera, perFrameFunctions) {
+    const renderHandler = () => {
+      for (let i = 0; i < perFrameFunctions.length; i++) {
+        perFrameFunctions[i]();
+      }
+
+      if (showStats) this.stats.update();
+      if (this.spec.postprocessing) this.postRenderer.composer.render();
+      else this.renderer.render(scene, camera);
+
+      this.animationFrame = requestAnimationFrame(renderHandler);
+    };
+
+    renderHandler();
+  }
+
+  cancelRender() {
+    if (this.usingGSAP) TweenLite.ticker.removeEventListener('tick', this.renderHandler);
+    else cancelAnimationFrame(this.animationFrame);
+    this.renderer.clear();
+    this.usingGSAP = false;
+  }
+
+  checkGSAPScriptLoaded() {
+    if (typeof TweenLite === 'undefined') {
+      let msg = 'ModularTHREE Error: GSAP not loaded.\n';
+      msg += 'Attempting to use THREE for animation.\n';
+      msg += 'If you do not wish to use GSAP set rendererSpec.useGSAP = false\n';
+      msg += 'Otherwise try adding <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js">';
+      msg += '</script> to your <head>';
+      console.error(msg);
+      return false;
+    }
+    return true;
   }
 }

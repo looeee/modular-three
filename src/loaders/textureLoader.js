@@ -1,5 +1,5 @@
 import {
-  loadingManager
+  loadingManager,
 }
 from './loadingManager';
 // *****************************************************************************
@@ -15,5 +15,6 @@ export function textureLoader(url) {
   if (!loader) loader = new THREE.TextureLoader(loadingManager);
 
   if (!textures[url]) textures[url] = loader.load(url);
+
   return textures[url];
 }
