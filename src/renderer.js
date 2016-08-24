@@ -134,6 +134,8 @@ export class Renderer {
 
   animateWithTHREE(scene, camera, perFrameFunctions) {
     const renderHandler = () => {
+      this.animationFrame = requestAnimationFrame(renderHandler);
+      
       for (let i = 0; i < perFrameFunctions.length; i++) {
         perFrameFunctions[i]();
       }
@@ -141,8 +143,6 @@ export class Renderer {
       if (showStats) this.stats.update();
       if (this.spec.postprocessing) this.postRenderer.composer.render();
       else this.renderer.render(scene, camera);
-
-      this.animationFrame = requestAnimationFrame(renderHandler);
     };
 
     renderHandler();

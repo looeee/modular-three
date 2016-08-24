@@ -10,8 +10,8 @@ Loaders
 postprocessing
   - implement
 
-rendererSpec, cameraSpec
-  add all possible options
+renderer, camera, scene
+ - add methods for setting all options
 
 Misc
   - stats not working

@@ -1,7 +1,7 @@
 {
   "name": "modular-three",
   "title": "Modular THREE.js",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "main": "dist/index.js",
   "description": "THREE.js modular ES2015 setup",
   "homepage": "https://github.com/looeee/modular-three",
@@ -21,10 +21,13 @@
     "es6",
     "modules"
   ],
+  "dependencies": {
+    "lodash.throttle": "^4.1.1"
+  },
   "devDependencies": {
     "babel-core": "^6.11.4",
     "babel-eslint": "^6.1.2",
-    "babel-preset-es2015": "6.13.2",
+    "babel-preset-es2015": "^6.13.2",
     "babel-preset-es2015-loose-rollup": "^7.0.0",
     "eslint": "^3.3.1",
     "eslint-config-airbnb": "^10.0.1",
@@ -38,7 +41,6 @@
     "gulp-nsp": "^2.1.0",
     "gulp-plumber": "^1.1.0",
     "gulp-util": "^3.0.7",
-    "lodash.throttle": "^4.1.1",
     "rollup-plugin-babel": "^2.6.1",
     "rollup-stream": "^1.11.0",
     "vinyl-source-stream": "^1.1.0"

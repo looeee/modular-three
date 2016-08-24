@@ -264,14 +264,14 @@ var Renderer = function () {
     var _this2 = this;
 
     var renderHandler = function () {
+      _this2.animationFrame = requestAnimationFrame(renderHandler);
+
       for (var i = 0; i < perFrameFunctions.length; i++) {
         perFrameFunctions[i]();
       }
 
       if (showStats) _this2.stats.update();
       if (_this2.spec.postprocessing) _this2.postRenderer.composer.render();else _this2.renderer.render(scene, camera);
-
-      _this2.animationFrame = requestAnimationFrame(renderHandler);
     };
 
     renderHandler();
@@ -511,6 +511,14 @@ var Drawing = function () {
 
   Drawing.prototype.cancelRender = function cancelRender() {
     this.scene.renderer.cancelRender();
+  };
+
+  Drawing.prototype.addPerFrameFunction = function addPerFrameFunction(func) {
+    if (typeof func === 'function') this.perFrameFunctions.push(func);else {
+      var msg = 'modularTHREE.Drawing.perFrameFunctions() typeError:';
+      msg += 'Attempting to add something that is not a function!';
+      console.error(msg);
+    }
   };
 
   return Drawing;

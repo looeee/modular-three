@@ -53,4 +53,13 @@ export class Drawing {
   cancelRender() {
     this.scene.renderer.cancelRender();
   }
+
+  addPerFrameFunction(func) {
+    if (typeof func === 'function') this.perFrameFunctions.push(func);
+    else {
+      let msg = 'modularTHREE.Drawing.perFrameFunctions() typeError:';
+      msg += 'Attempting to add something that is not a function!';
+      console.error(msg);
+    }
+  }
 }
