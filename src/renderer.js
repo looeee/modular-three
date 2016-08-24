@@ -87,14 +87,14 @@ export class Renderer {
     this.setSize(this.spec.width(), this.spec.height());
   }
 
-  showStats() {
+  initStats() {
     if (this.stats) return; //don't create stats more than once
     this.stats = new Stats();
     document.body.appendChild(this.stats.dom);
   }
 
   render(scene, camera, perFrameFunctions) {
-    if (showStats) this.showStats();
+    if (showStats) this.initStats();
     if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
 
     if (this.spec.useGSAP && this.checkGSAPScriptLoaded()) {

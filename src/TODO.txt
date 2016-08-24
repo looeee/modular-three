@@ -12,3 +12,6 @@ postprocessing
 
 rendererSpec, cameraSpec
   add all possible options
+
+Misc
+  - stats not working
