@@ -1,7 +1,7 @@
 {
   "name": "modular-three",
   "title": "Modular THREE.js",
-  "version": "0.0.2",
+  "version": "0.1.2",
   "main": "dist/index.js",
   "description": "THREE.js modular ES2015 setup",
   "homepage": "https://github.com/looeee/modular-three",
