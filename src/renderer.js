@@ -1,3 +1,5 @@
+import * as THREE from 'three/src/Three.js';
+
 import {
   config,
 }
@@ -16,8 +18,6 @@ const showStats = config.showStats;
 // elem for the cancelRender function to work
 // The container elem can be omitted if using only one scene as the default
 // will be automatically added
-// NOTE: Currently using TweenMax ticker for animation so the gsap files must
-// be included
 //
 // The following spec object can be omitted for the following defaults
 // const rendererSpec = {
@@ -135,7 +135,7 @@ export class Renderer {
   animateWithTHREE(scene, camera, perFrameFunctions) {
     const renderHandler = () => {
       this.animationFrame = requestAnimationFrame(renderHandler);
-      
+
       for (let i = 0; i < perFrameFunctions.length; i++) {
         perFrameFunctions[i]();
       }

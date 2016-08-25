@@ -1,4 +1,8 @@
-const throttle = require('lodash.throttle');
+import * as THREE from 'three/src/Three.js';
+
+// import {
+//   throttle,
+// } from 'lodash.throttle';
 
 import {
   Scene,
@@ -15,11 +19,11 @@ const resetDrawings = () => {
     });
 };
 
-window.addEventListener('resize',
-  throttle(() => {
-    resetDrawings();
-  }, 500),
-false);
+// window.addEventListener('resize',
+//   throttle(() => {
+//     resetDrawings();
+//   }, 500),
+// false);
 
 // *****************************************************************************
 //

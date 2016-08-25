@@ -1,0 +1,96 @@
+const path = require('path');
+const gulp = require('gulp');
+
+// const gutil = require('gulp-util');
+// const plumber = require('gulp-plumber');
+
+// Test for known node vulnerabilities
+const nsp = require('gulp-nsp');
+
+// ES2015 build related plugins
+// const rollup = require('rollup-stream');
+// const babel = require('rollup-plugin-babel');
+// const source = require('vinyl-source-stream');
+
+//const rollup = require('rollup').rollup;
+//const babel = require('rollup-plugin-babel');
+const nodeResolve = require('rollup-plugin-node-resolve');
+const commonjs = require('rollup-plugin-commonjs');
+const filesize = require('rollup-plugin-filesize');
+
+const rollup = require('gulp-rollup');
+//const rollupIncludePaths =require('rollup-plugin-includepaths');
+const babel = require('gulp-babel');
+const rename = require('gulp-rename');
+const util = require('gulp-util');
+
+
+// function bundle() {
+//   rollup({
+//     entry: 'src/index.js',
+//     plugins: [
+//       babel({
+//         exclude: 'node_modules/**',
+//         babelrc: false,
+//         presets: ['es2015-loose-rollup'],
+//       }),
+//     ],
+//   })
+//     //.pipe(gutil.log())
+//     //.on('error', gutil.log)
+//     // .pipe(plumber({
+//     //   handleError: (err) => {
+//     //     console.log(err);
+//     //     this.emit('end');
+//     //   },
+//     // }))
+//     .pipe(source('index.js'))
+//     .pipe(gulp.dest('dist/'));
+// }
+
+gulp.task('rollup', () => {
+  return gulp.src('src/index.js')
+        .pipe(rollup({
+          allowRealFiles: true,
+          entry: './src/index.js',
+          plugins: [
+            nodeResolve({
+              jsnext: false,
+              //module: false,
+              //main: false,
+            }),
+            commonjs({
+              include: ['node_modules/**'],
+              namedExports: {
+              // left-hand side can be an absolute path, a path
+              // relative to the current directory, or the name
+              // of a module in node_modules
+              'three': ['Scene']
+  }
+            }),
+            // babel({
+            //   exclude: 'node_modules/**',
+            //   //babelrc: false,
+            //   //presets: ['es2015'],
+            // }),
+            filesize(),
+          ],
+        }))
+        .pipe(babel())
+        .on('error', util.log)
+        .pipe(rename('index.js'))
+        //.pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest('dist/'));
+});
+
+gulp.task('nsp', (cb) => {
+  nsp({
+    package: path.resolve('package.json'),
+  }, cb);
+});
+
+gulp.task('watch', () => {
+  gulp.watch(['src/**/*.js'], ['rollup']);
+});
+
+gulp.task('default', ['rollup', 'watch']);

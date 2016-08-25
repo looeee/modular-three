@@ -1,7 +1,11 @@
+import * as THREE from 'three/src/Three.js';
+
 import {
   loadingManager,
 }
 from './loadingManager';
+
+
 // *****************************************************************************
 //  THREE JSON object format loader
 //  includes simple memoization to ensure

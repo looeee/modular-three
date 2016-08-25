@@ -1,39 +1,57 @@
 const path = require('path');
 const gulp = require('gulp');
 
-// const gutil = require('gulp-util');
-// const plumber = require('gulp-plumber');
+const gutil = require('gulp-util');
 
 // Test for known node vulnerabilities
 const nsp = require('gulp-nsp');
 
-// ES2015 build related plugins
-const rollup = require('rollup-stream');
+const rollup = require('rollup').rollup;
 const babel = require('rollup-plugin-babel');
-const source = require('vinyl-source-stream');
+const nodeResolve = require('rollup-plugin-node-resolve');
+const filesize = require('rollup-plugin-filesize');
 
-function bundle() {
-  rollup({
-    entry: 'src/index.js',
+//Compile glsl code
+const glsl = () => {
+  return {
+    transform(code, id) {
+      if (!/\.glsl$/.test(id)) return;
+
+      return 'export default ' + JSON.stringify(
+        code
+        .replace(/[ \t]*\/\/.*\n/g, '')
+        .replace(/[ \t]*\/\*[\s\S]*?\*\//g, '')
+        .replace(/\n{2,}/g, '\n')
+      ) + ';';
+    },
+  };
+};
+
+gulp.task('rollup', () => {
+  return rollup({
+    entry: './src/index.js',
     plugins: [
+      nodeResolve({
+        jsnext: true,
+        module: true,
+      }),
+      glsl(),
       babel({
         exclude: 'node_modules/**',
         babelrc: false,
         presets: ['es2015-loose-rollup'],
       }),
+      filesize(),
     ],
   })
-    //.pipe(gutil.log())
-    //.on('error', gutil.log)
-    // .pipe(plumber({
-    //   handleError: (err) => {
-    //     console.log(err);
-    //     this.emit('end');
-    //   },
-    // }))
-    .pipe(source('index.js'))
-    .pipe(gulp.dest('dist/'));
-}
+    .then((bundle) => {
+      return bundle.write({
+        format: 'es',
+        moduleName: 'modularTHREE',
+        dest: 'dist/index.js',
+      });
+    });
+});
 
 gulp.task('nsp', (cb) => {
   nsp({
@@ -42,7 +60,7 @@ gulp.task('nsp', (cb) => {
 });
 
 gulp.task('watch', () => {
-  gulp.watch(['src/**/*.js'], bundle);
+  gulp.watch(['src/**/*.js'], ['rollup']);
 });
 
-gulp.task('default', ['watch']);
+gulp.task('default', ['rollup', 'watch']);

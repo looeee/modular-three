@@ -1,7 +1,10 @@
+import * as THREE from 'three/src/Three.js';
+
 import {
   config,
 }
 from '../config';
+
 // *****************************************************************************
 //  LOADING MANAGER
 //  To be used by all other loaders

@@ -1,7 +1,10 @@
+import * as THREE from 'three/src/Three.js';
+
 import {
   loadingManager,
 }
 from './loadingManager';
+
 // *****************************************************************************
 //  Texture Loader
 //  includes simple memoization to ensure

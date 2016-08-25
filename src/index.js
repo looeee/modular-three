@@ -1,26 +1,30 @@
-import {
+import * as THREE from 'three/src/Three.js';
+
+window.THREE = THREE;
+
+export {
   MeshObject,
 }
 from './meshObject';
 
-import {
+export {
   Drawing,
 }
 from './drawing';
 
-import {
+export {
   init,
 }
 from './initialisation';
 
-import {
+export {
   config,
 }
 from './config';
 
-module.exports = {
-  init,
-  config,
-  MeshObject,
-  Drawing,
-};
+// module.exports = {
+//   init,
+//   config,
+//   MeshObject,
+//   Drawing,
+// };

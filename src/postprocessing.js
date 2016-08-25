@@ -1,3 +1,5 @@
+import * as THREE from 'three/src/Three.js';
+
 // *****************************************************************************
 // POSTPROCESSING CLASS
 // Post effects for THREE.js
