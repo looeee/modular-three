@@ -1,7 +1,7 @@
 {
   "name": "modular-three",
   "title": "Modular THREE.js",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "main": "dist/index.js",
   "description": "THREE.js modular ES2015 setup",
   "homepage": "https://github.com/looeee/modular-three",
@@ -22,10 +22,12 @@
     "modules"
   ],
   "dependencies": {
+    "lodash-es": "^4.15.0",
     "lodash.throttle": "^4.1.1",
     "three": "^0.80.1"
   },
   "devDependencies": {
+    "babel": "^6.5.2",
     "babel-core": "^6.11.4",
     "babel-eslint": "^6.1.2",
     "babel-plugin-external-helpers": "^6.8.0",

@@ -11,17 +11,6 @@ from './loaders/loadingManager';
 // *****************************************************************************
 const moduleName = 'ModularTHREE';
 
-// const checkTHREELoaded = () => {
-//   if (typeof THREE === 'undefined') {
-//     let msg = `${moduleName} Error: THREE not loaded. THREE.js must be loaded before this module\n`;
-//     msg += 'Try adding <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.min.js">';
-//     msg += '</script> to your <head>';
-//     console.error(msg);
-//   }
-// };
-//
-// checkTHREELoaded();
-
 const checkHeartcodeLoaded = () => {
   if (typeof CanvasLoader === 'undefined') {
     let msg = `${moduleName} Error: HeartcodeLoader not loaded.\n`;

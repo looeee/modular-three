@@ -32,8 +32,8 @@ gulp.task('rollup', () => {
     entry: './src/index.js',
     plugins: [
       nodeResolve({
-        jsnext: true,
-        module: true,
+        jsnext: false,
+        module: false,
       }),
       glsl(),
       babel({

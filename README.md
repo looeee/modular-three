@@ -1,11 +1,16 @@
 Modular THREE.js [![NPM version][npm-image]][npm-url]
 ========
 
-Modular setup for THREE.js designed to be used with ES2015 and Browserify
-(or some other tool that allow you to import modules in the browser).
+ModularTHREE simplifies the creation of [**THREE.js**](http://threejs.org/) based [**WebGL**](https://en.wikipedia.org/wiki/WebGL) scenes written in **ES2015**. In particular it handles:
+
+* Basic scene setup
+* Ressizing your scene when the window is resized
+* [Memoization](https://en.wikipedia.org/wiki/Memoization) of scene assets such as models and textures
+* Advanced animation using [**GSAP**](http://greensock.com/gsap)
+
+
 To see it in action check out [**Modular THREE Boilerplate**](https://github.com/looeee/modular-three-boilerplate),
-which includes a Gulp setup for compiling ES2015 with
-[Browserify](http://browserify.org/),
+which includes a [Gulp](http://gulpjs.com/) setup for compiling ES2015 with
 [Rollup](http://rollupjs.org/) and [Babel](https://babeljs.io/),
 as well as compiling and [autoprefixing](https://github.com/postcss/autoprefixer)
 [SCSS](http://sass-lang.com/) and piping through [Livereload](http://livereload.com/)
@@ -21,19 +26,9 @@ Installation
 
 Run
 ```sh
-$ npm install --save npm-module-test
+$ npm install --save modular-three
 ```
 from your project root folder.
-
-Requirements
-------
-
-Load [THREE.js](http://threejs.org/).
-The simplest way is to include
-
-```<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.min.js">```
-
-in your ```<head>```.
 
 Optional Addons
 ------
@@ -74,8 +69,10 @@ Usage
 
 First include **modularTHREE** at the start of any files that use it like so:
 ```js
-const modularTHREE = require('modular-three');
+import * as modularTHREE from 'modular-three';
 ```
+
+This will also add THREE as a global object, so you can now use all THREE functions as normal.
 
 #### Creating a drawing ####
 
@@ -160,9 +157,7 @@ them to be recalculated on window resize.
 ```rendererSpec``` and ```cameraSpec``` cover the minimal amount of options that **must** be set for every THREE scene. The ability to set all scene/camera/renderer options will be added in a future update.
 
 #### Adding Objects to the Drawing ####
-ModularTHREE currently provides the MeshObject class, which memoizes texture loading
-(so that textures are not reloaded when the scene is reset, for example on window resize)
-and interfaces with the [THREE.LoadingManager](http://threejs.org/docs/?q=loading#Reference/Loaders/LoadingManager),
+ModularTHREE currently provides the MeshObject class, which interfaces with the [THREE.LoadingManager](http://threejs.org/docs/?q=loading#Reference/Loaders/LoadingManager),
 which can be used to provide a loading overlay, using for example  [**HeartcodeLoader**](https://github.com/heartcode/CanvasLoader),
 or you own custom loader.
 
@@ -182,8 +177,7 @@ class Cube extends modularTHREE.MeshObject {
 }
 ```
 
-Again the spec here is optional, but can be used to pass in variables such as material,
-dimension etc.
+Again the **spec** object is optional, but can be used to pass in variables such as material, dimensions etc.
 
 Next, update the ```init()``` function of your ```Drawing``` class to instantiate the cube.
 
@@ -202,9 +196,9 @@ class ExampleDrawing extends modularTHREE.Drawing {
 
 And that's it! You should now have a small red cube in the middle of a black screen.
 
-Let's make it a bit more interesting. We'll copy [this example of a spinning wooden cube]((http://threejs.org/examples/#webgl_geometry_cube)).
+Let's make it a bit more interesting. We'll copy this example of a [**spinning wooden cube**]((http://threejs.org/examples/#webgl_geometry_cube)).
 
-First, copy the texture file [crate.jpg](https://github.com/looeee/modular-three-boilerplate/blob/master/images/textures/crate.jpg) into your project root - say into ```<project-root>/images/textures/crate.jpg```.
+First, copy the texture file [**crate.jpg**](https://github.com/looeee/modular-three-boilerplate/blob/master/images/textures/crate.jpg) into your project root - say into ```<project-root>/images/textures/crate.jpg```.
 
 Next update the ```Cube.init()``` function to use this texture:
 
@@ -223,7 +217,7 @@ init() {
 
 Let's make the cube spin.
 
-The standard method of adding animation with THREE is to use [```window.requestAnimationFrame()```](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame), and update the objects we want to animate each frame. See the [source code for the spinning cube](http://threejs.org/examples/webgl_geometry_cube.html) for an example.
+The standard method of adding animation with THREE is to use [```window.requestAnimationFrame()```](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame), and update the objects we want to animate each frame. See the [**source code for the spinning cube**](http://threejs.org/examples/webgl_geometry_cube.html) for an example.
 
 To add a function which will be called every animationFrame to your drawing, call ```Drawing.addPerFrameFunction(yourFunction)```. Here is our testDrawing extended to make the cube rotate:
 
@@ -291,9 +285,20 @@ initObjects() {
 
     cubeTimeline.add(cubeFallTween);
 
+    //add the rotation tween at time 0 so that falling and rotating happen
+    //simultaneously
     cubeTimeline.add(cubeRotateTween, 0);
   }
 ```
+
+#### Postprocessing ####
+
+Forthcoming...
+
+#### Using custom loaders with the THREE.LoadingManager ####
+
+Forthcoming...
+
 
 #### License MIT © Lewy Blue 2016 ####
 
