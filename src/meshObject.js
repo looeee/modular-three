@@ -1,7 +1,4 @@
-import {
-  textureLoader,
-}
-from './loaders/textureLoader';
+import { textureLoader } from './loaders/textureLoader';
 // *****************************************************************************
 // MESH OBJECT SUPERCLASS
 // Superclass for any THREE.js mesh object. Returns a THREE mesh

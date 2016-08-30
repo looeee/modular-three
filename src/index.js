@@ -1,6 +1,13 @@
-import * as THREE from 'three/src/Three.js';
+// import * as THREE from 'three/src/Three.js';
+//
+// window.THREE = THREE;
 
-window.THREE = THREE;
+//const Stats = require('three/examples/js/libs/stats.min.js');
+
+// export {
+//   loadingManager,
+// }
+// from './loaders/loadingManager';
 
 export {
   MeshObject,
@@ -22,9 +29,10 @@ export {
 }
 from './config';
 
-// module.exports = {
+// exports = {
 //   init,
 //   config,
 //   MeshObject,
 //   Drawing,
+//   loadingManager,
 // };

@@ -1,11 +1,6 @@
-import * as THREE from 'three/src/Three.js';
-
-import {
-  config,
-}
-from './config';
-
-const showStats = config.showStats;
+// import * as THREE from 'three/src/Three.js';
+import { config } from './config';
+let showStats = config.showStats;
 // import {
 //   Postprocessing,
 // }
@@ -21,7 +16,7 @@ const showStats = config.showStats;
 //
 // The following spec object can be omitted for the following defaults
 // const rendererSpec = {
-//   containerElem: canvasElem, // omit for THREE js default
+//   containerElem: '',
 //   antialias: true,
 //   alpha: false, //true required for multiple scenes
 //   autoClear: true, //false required for multiple scenes
@@ -101,8 +96,19 @@ export class Renderer {
 
   initStats() {
     if (this.stats) return; //don't create stats more than once
-    this.stats = new Stats();
-    document.body.appendChild(this.stats.dom);
+    if (typeof Stats === 'undefined') {
+      let msg = `modularTHREE Error: Stats not loaded.\n`;
+      msg += `If you do not wish to show Stats set modularTHREE.config.showStats = false\n`;
+      msg += 'Otherwise get https://raw.githubusercontent.com/mrdoob/stats.js/master/build/stats.min.js\n';
+      msg += 'and add <script src="path-to-script/stats.min.js">';
+      msg += '</script> to your <head>';
+      console.error(msg);
+      showStats = false;
+    }
+    else {
+      this.stats = new Stats();
+      document.body.appendChild(this.stats.dom);
+    }
   }
 
   render(scene, camera, perFrameFunctions) {

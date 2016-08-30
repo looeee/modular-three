@@ -2,10 +2,10 @@ import {
   config,
 }
 from './config';
-import {
-  initHeartcodeLoader,
-}
-from './loaders/loadingManager';
+// import {
+//   initHeartcodeLoader,
+// }
+// from './loaders/loadingManager';
 // *****************************************************************************
 // Perform various initialisation checks and setup
 // *****************************************************************************
@@ -40,11 +40,11 @@ const checkStatsLoaded = () => {
 export const init = () => {
   if (config.showHeartcodeLoader) {
     if (checkHeartcodeLoaded()) {
-      initHeartcodeLoader();
+      //initHeartcodeLoader();
     }
   }
 
-  if (config.showStats) checkStatsLoaded();
+  //if (config.showStats) checkStatsLoaded();
 
   config.initCalled = true;
 };

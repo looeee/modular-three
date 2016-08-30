@@ -4,7 +4,7 @@ Modular THREE.js [![NPM version][npm-image]][npm-url]
 ModularTHREE simplifies the creation of [**THREE.js**](http://threejs.org/) based [**WebGL**](https://en.wikipedia.org/wiki/WebGL) scenes written in **ES2015**. In particular it handles:
 
 * Basic scene setup
-* Ressizing your scene when the window is resized
+* Resizing your scene when the window is resized
 * [Memoization](https://en.wikipedia.org/wiki/Memoization) of scene assets such as models and textures
 * Advanced animation using [**GSAP**](http://greensock.com/gsap)
 

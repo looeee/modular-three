@@ -1,9 +1,5 @@
-import * as THREE from 'three/src/Three.js';
-
-import {
-  loadingManager,
-}
-from './loadingManager';
+// import * as THREE from 'three/src/Three.js';
+//import { loadingManager } from './loadingManager';
 
 // *****************************************************************************
 //  Texture Loader
@@ -15,7 +11,8 @@ let loader = null;
 const textures = {};
 
 export function textureLoader(url) {
-  if (!loader) loader = new THREE.TextureLoader(loadingManager);
+  //if (!loader) loader = new THREE.TextureLoader(loadingManager);
+  if (!loader) loader = new THREE.TextureLoader();
 
   if (!textures[url]) textures[url] = loader.load(url);
 

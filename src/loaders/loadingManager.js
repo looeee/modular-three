@@ -1,9 +1,6 @@
-import * as THREE from 'three/src/Three.js';
+// import * as THREE from 'three/src/Three.js';
 
-import {
-  config,
-}
-from '../config';
+import { config } from '../config';
 
 // *****************************************************************************
 //  LOADING MANAGER
@@ -37,14 +34,14 @@ export const initHeartcodeLoader = () => {
   loadingIcon.show(); // Hidden by default
 };
 
-export const loadingManager = new THREE.LoadingManager();
-
-loadingManager.onLoad = () => {
-  if (loadingIcon) {
-    loadingIcon.hide();
-    TweenLite.to(loadingOverlay, 2, {
-      opacity: 0,
-      onComplete: () => loadingOverlay.classList.add('hide'),
-    });
-  }
-};
+// export const loadingManager = new THREE.LoadingManager();
+//
+// loadingManager.onLoad = () => {
+//   if (loadingIcon) {
+//     loadingIcon.hide();
+//     TweenLite.to(loadingOverlay, 2, {
+//       opacity: 0,
+//       onComplete: () => loadingOverlay.classList.add('hide'),
+//     });
+//   }
+// };

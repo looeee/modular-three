@@ -1,17 +1,11 @@
-import * as THREE from 'three/src/Three.js';
+// import * as THREE from 'three/src/Three.js';
+import { Renderer } from './renderer';
+import { Camera } from './camera';
 
-import {
-  Renderer,
-}
-from './renderer';
-import {
-  Camera,
-}
-from './camera';
 // *****************************************************************************
 //  SCENE CLASS
 //
-//  THREE.js scene is used by DRAWING classes
+//  Used by DRAWING classes
 //
 // *****************************************************************************
 export class Scene {
@@ -22,6 +16,7 @@ export class Scene {
   }
 
   init() {
+    // this.scene = new THREE.Scene();
     this.scene = new THREE.Scene();
     this.camera = new Camera(this.cameraSpec);
     this.scene.add(this.camera.cam);

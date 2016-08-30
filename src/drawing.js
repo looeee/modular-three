@@ -1,4 +1,4 @@
-import * as THREE from 'three/src/Three.js';
+// import * as THREE from 'three/src/Three.js';
 
 import throttle from 'lodash-es/throttle';
 
@@ -34,6 +34,7 @@ export class Drawing {
     this.camera = this.scene.camera;
 
     this.uuid = THREE.Math.generateUUID();
+
     drawings[this.uuid] = this;
 
     this.perFrameFunctions = [];
