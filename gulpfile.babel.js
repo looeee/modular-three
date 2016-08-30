@@ -1,6 +1,5 @@
 const path = require('path');
 const gulp = require('gulp');
-const gutil = require('gulp-util');
 
 // Test for known node vulnerabilities
 const nsp = require('gulp-nsp');
@@ -8,24 +7,7 @@ const nsp = require('gulp-nsp');
 const rollup = require('rollup').rollup;
 const babel = require('rollup-plugin-babel');
 const nodeResolve = require('rollup-plugin-node-resolve');
-const commonjs = require('rollup-plugin-commonjs');
 const filesize = require('rollup-plugin-filesize');
-
-//Compile glsl code
-const glsl = () => {
-  return {
-    transform(code, id) {
-      if (!/\.glsl$/.test(id)) return;
-
-      return 'export default ' + JSON.stringify(
-        code
-        .replace(/[ \t]*\/\/.*\n/g, '')
-        .replace(/[ \t]*\/\*[\s\S]*?\*\//g, '')
-        .replace(/\n{2,}/g, '\n')
-      ) + ';';
-    },
-  };
-};
 
 gulp.task('rollup', () => {
   return rollup({
@@ -35,10 +17,6 @@ gulp.task('rollup', () => {
         jsnext: false,
         module: false,
       }),
-      // commonjs({
-      //   exclude: ['node_modules/three/**', 'node_modules/lodash-es/**'],
-      // }),
-      // glsl(),
       babel({
         exclude: 'node_modules/**',
         babelrc: false,
