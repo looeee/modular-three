@@ -9,7 +9,7 @@ const babel = require('rollup-plugin-babel');
 const nodeResolve = require('rollup-plugin-node-resolve');
 const filesize = require('rollup-plugin-filesize');
 
-gulp.task('rollup', () => {
+gulp.task('bundle', () => {
   return rollup({
     entry: './src/index.js',
     plugins: [
@@ -41,7 +41,7 @@ gulp.task('nsp', (cb) => {
 });
 
 gulp.task('watch', () => {
-  gulp.watch(['src/**/*.js'], ['rollup']);
+  gulp.watch(['src/**/*.js'], ['bundle']);
 });
 
-gulp.task('default', ['rollup', 'watch']);
+gulp.task('default', ['bundle', 'watch']);

@@ -5,21 +5,12 @@ const warnIfConfigUpdatedAfterInit = () => {
 export const config = {
   initCalled: false,
 
-  heartcodeLoader: false,
-  get showHeartcodeLoader() {
-    return this.heartcodeLoader;
+  loadingManager: false,
+  get useLoadingManager() {
+    return this.loadingManager;
   },
-  set showHeartcodeLoader(value) {
+  set useLoadingManager(value) {
     if (this.initCalled) warnIfConfigUpdatedAfterInit();
-    this.heartcodeLoader = value;
-  },
-
-  stats: true,
-  get showStats() {
-    return this.stats;
-  },
-  set showStats(value) {
-    if (this.initCalled) warnIfConfigUpdatedAfterInit();
-    this.stats = value;
+    this.loadingManager = value;
   },
 };

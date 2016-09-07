@@ -1,38 +1,12 @@
-// import * as THREE from 'three/src/Three.js';
-//
-// window.THREE = THREE;
+import { MeshObject } from './meshObject';
+import { Drawing } from './drawing';
+import { init } from './initialisation';
+import { config } from './config';
 
-//const Stats = require('three/examples/js/libs/stats.min.js');
-
-// export {
-//   loadingManager,
-// }
-// from './loaders/loadingManager';
-
-export {
+export default {
   MeshObject,
-}
-from './meshObject';
-
-export {
   Drawing,
-}
-from './drawing';
-
-export {
   init,
-}
-from './initialisation';
-
-export {
   config,
-}
-from './config';
-
-// exports = {
-//   init,
-//   config,
-//   MeshObject,
-//   Drawing,
-//   loadingManager,
-// };
+  loadingManager: null,
+};

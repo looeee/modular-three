@@ -1,11 +1,5 @@
-// import * as THREE from 'three/src/Three.js';
-
 import throttle from 'lodash-es/throttle';
-
-import {
-  Scene,
-}
-from './scene';
+import { Scene } from './scene';
 
 //hold a reference to all drawings so that they can be reset easily
 const drawings = {};

@@ -1,10 +1,6 @@
-// import * as THREE from 'three/src/Three.js';
 import { config } from './config';
-let showStats = config.showStats;
-// import {
-//   Postprocessing,
-// }
-// from './postprocessing';
+import { Postprocessing } from './postprocessing';
+
 // *****************************************************************************
 // RENDERER CLASS
 //
@@ -69,6 +65,7 @@ export class Renderer {
   }
 
   initParams() {
+    if (!this.spec.showStats) this.spec.showStats = false;
     if (!this.spec.postprocessing) this.spec.postprocessing = false;
     if (!this.spec.antialias) this.spec.antialias = true;
     if (!this.spec.alpha) this.spec.alpha = true;
@@ -98,12 +95,11 @@ export class Renderer {
     if (this.stats) return; //don't create stats more than once
     if (typeof Stats === 'undefined') {
       let msg = `modularTHREE Error: Stats not loaded.\n`;
-      msg += `If you do not wish to show Stats set modularTHREE.config.showStats = false\n`;
+      msg += `If you do not wish to show Stats set rendererSpec.showStats = false\n`;
       msg += 'Otherwise get https://raw.githubusercontent.com/mrdoob/stats.js/master/build/stats.min.js\n';
-      msg += 'and add <script src="path-to-script/stats.min.js">';
-      msg += '</script> to your <head>';
+      msg += 'and add it to your build.';
       console.error(msg);
-      showStats = false;
+      this.spec.showStats = false;
     }
     else {
       this.stats = new Stats();
@@ -112,10 +108,10 @@ export class Renderer {
   }
 
   render(scene, camera, perFrameFunctions) {
-    if (showStats) this.initStats();
+    if (this.spec.showStats) this.initStats();
     if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
 
-    if (this.spec.useGSAP && this.checkGSAPScriptLoaded()) {
+    if (this.spec.useGSAP && this.checkGSAPLoaded()) {
       this.animateWithGSAP(scene, camera, perFrameFunctions);
     }
     else {
@@ -129,7 +125,7 @@ export class Renderer {
         perFrameFunctions[i]();
       }
 
-      if (showStats) this.stats.update();
+      if (this.spec.showStats) this.stats.update();
       if (this.spec.postprocessing) this.postRenderer.composer.render();
       else this.renderer.render(scene, camera);
     };
@@ -146,7 +142,7 @@ export class Renderer {
         perFrameFunctions[i]();
       }
 
-      if (showStats) this.stats.update();
+      if (this.spec.showStats) this.stats.update();
       if (this.spec.postprocessing) this.postRenderer.composer.render();
       else this.renderer.render(scene, camera);
     };
@@ -161,7 +157,7 @@ export class Renderer {
     this.usingGSAP = false;
   }
 
-  checkGSAPScriptLoaded() {
+  checkGSAPLoaded() {
     if (typeof TweenLite === 'undefined') {
       let msg = 'ModularTHREE Error: GSAP not loaded.\n';
       msg += 'Attempting to use THREE for animation.\n';

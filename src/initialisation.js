@@ -1,29 +1,9 @@
-import {
-  config,
-}
-from './config';
-// import {
-//   initHeartcodeLoader,
-// }
-// from './loaders/loadingManager';
+import modularTHREE from './index';
+import { config } from './config';
 // *****************************************************************************
 // Perform various initialisation checks and setup
 // *****************************************************************************
 const moduleName = 'ModularTHREE';
-
-const checkHeartcodeLoaded = () => {
-  if (typeof CanvasLoader === 'undefined') {
-    let msg = `${moduleName} Error: HeartcodeLoader not loaded.\n`;
-    msg += `If you do not wish to use HeartcodeLoader set ${moduleName}.config.useHeartcodeLoader = false\n`;
-    msg += 'Otherwise get https://raw.githubusercontent.com/heartcode/';
-    msg += 'CanvasLoader/master/js/heartcode-canvasloader-min.js\n';
-    msg += 'and add <script src="path-to-script/heartcode-canvasloader-min.js">';
-    msg += '</script> to your <head>';
-    console.error(msg);
-    return false;
-  }
-  return true;
-};
 
 const checkStatsLoaded = () => {
   if (typeof Stats === 'undefined') {
@@ -38,13 +18,6 @@ const checkStatsLoaded = () => {
 };
 
 export const init = () => {
-  if (config.showHeartcodeLoader) {
-    if (checkHeartcodeLoaded()) {
-      //initHeartcodeLoader();
-    }
-  }
-
-  //if (config.showStats) checkStatsLoaded();
-
+  if (config.useLoadingManager) modularTHREE.loadingManager = new THREE.LoadingManager();
   config.initCalled = true;
 };

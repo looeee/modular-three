@@ -1,6 +1,4 @@
-// import * as THREE from 'three/src/Three.js';
-//import { loadingManager } from './loadingManager';
-
+import modularTHREE from '../index';
 // *****************************************************************************
 //  Texture Loader
 //  includes simple memoization to ensure
@@ -11,8 +9,12 @@ let loader = null;
 const textures = {};
 
 export function textureLoader(url) {
-  //if (!loader) loader = new THREE.TextureLoader(loadingManager);
-  if (!loader) loader = new THREE.TextureLoader();
+  if (!loader) {
+    if (modularTHREE.config.useLoadingManager) {
+      loader = new THREE.TextureLoader(modularTHREE.loadingManager);
+    }
+    else loader = new THREE.TextureLoader();
+  }
 
   if (!textures[url]) textures[url] = loader.load(url);
 

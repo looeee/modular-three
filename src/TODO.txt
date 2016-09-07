@@ -1,11 +1,10 @@
 Loading manager functionality:
- - use heartcodeLoader by default
- - allow access to THREE.loadingManager for custom loaders
- - don't use GSAP to fade out loader
+ - switch loader to https://github.com/jovey-zheng/loader
+ - refactor so that loader is generated on init() id required
 
 Loaders
  - textureLoader
-  - setup, and add updateTexture()
+  - add updateTexture()
 
 postprocessing
   - implement
@@ -13,5 +12,8 @@ postprocessing
 renderer, camera, scene
  - add methods for setting all options
 
-Misc
-  - stats not working
+stats
+  - make config setting work
+
+error messages
+  - update to reflect modular import style

@@ -1,6 +1,4 @@
-// import * as THREE from 'three/src/Three.js';
-// import { loadingManager } from './loadingManager';
-
+import modularTHREE from '../index';
 // *****************************************************************************
 //  THREE JSON object format loader
 //  includes simple memoization to ensure
@@ -12,8 +10,12 @@ let loader = null;
 const models = {};
 
 export function objectLoader(spec) {
-  //if (!loader) loader = new THREE.ObjectLoader(loadingManager);
-  if (!loader) loader = new THREE.ObjectLoader();
+  if (!loader) {
+    if (modularTHREE.config.useLoadingManager) {
+      loader = new THREE.ObjectLoader(modularTHREE.loadingManager);
+    }
+    else loader = new THREE.ObjectLoader();
+  }
 
   if (!models[spec.url]) {
     loader.load(spec.url, (mesh) => {
@@ -25,7 +27,8 @@ export function objectLoader(spec) {
       spec.scene.add(mesh);
       models[spec.url] = mesh;
     });
-  } else {
+  }
+  else {
     spec.scene.add(models[spec.url]);
   }
 }

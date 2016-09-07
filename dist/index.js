@@ -1,6 +1,3 @@
-// import * as THREE from 'three/src/Three.js';
-//import { loadingManager } from './loadingManager';
-
 // *****************************************************************************
 //  Texture Loader
 //  includes simple memoization to ensure
@@ -11,8 +8,11 @@ var loader = null;
 var textures = {};
 
 function textureLoader(url) {
-  //if (!loader) loader = new THREE.TextureLoader(loadingManager);
-  if (!loader) loader = new THREE.TextureLoader();
+  if (!loader) {
+    if (modularTHREE.config.useLoadingManager) {
+      loader = new THREE.TextureLoader(modularTHREE.loadingManager);
+    } else loader = new THREE.TextureLoader();
+  }
 
   if (!textures[url]) textures[url] = loader.load(url);
 
@@ -492,31 +492,48 @@ var warnIfConfigUpdatedAfterInit = function () {
 var config = {
   initCalled: false,
 
-  heartcodeLoader: false,
-  get showHeartcodeLoader() {
-    return this.heartcodeLoader;
+  loadingManager: false,
+  get useLoadingManager() {
+    return this.loadingManager;
   },
-  set showHeartcodeLoader(value) {
+  set useLoadingManager(value) {
     if (this.initCalled) warnIfConfigUpdatedAfterInit();
-    this.heartcodeLoader = value;
-  },
-
-  stats: true,
-  get showStats() {
-    return this.stats;
-  },
-  set showStats(value) {
-    if (this.initCalled) warnIfConfigUpdatedAfterInit();
-    this.stats = value;
+    this.loadingManager = value;
   }
 };
 
-// import * as THREE from 'three/src/Three.js';
-var showStats = config.showStats;
-// import {
-//   Postprocessing,
-// }
-// from './postprocessing';
+// *****************************************************************************
+// POSTPROCESSING CLASS
+// Post effects for THREE.js
+// Set postprocessing = true in renderSpec for a drawing to render with post effects
+// *****************************************************************************
+var Postprocessing = function () {
+  function Postprocessing(renderer, scene, camera) {
+    classCallCheck(this, Postprocessing);
+
+    this.renderer = renderer;
+    this.scene = scene;
+    this.camera = camera;
+    this.init();
+  }
+
+  Postprocessing.prototype.init = function init() {
+    this.composer = new THREE.EffectComposer(this.renderer);
+    this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
+    this.vignette();
+  };
+
+  Postprocessing.prototype.vignette = function vignette() {
+    var effectVignette = new THREE.ShaderPass(THREE.VignetteShader);
+    effectVignette.uniforms.offset.value = 0.95;
+    effectVignette.uniforms.darkness.value = 1.6;
+    effectVignette.renderToScreen = true;
+    this.composer.addPass(effectVignette);
+  };
+
+  return Postprocessing;
+}();
+
 // *****************************************************************************
 // RENDERER CLASS
 //
@@ -582,6 +599,7 @@ var Renderer = function () {
   };
 
   Renderer.prototype.initParams = function initParams() {
+    if (!this.spec.showStats) this.spec.showStats = false;
     if (!this.spec.postprocessing) this.spec.postprocessing = false;
     if (!this.spec.antialias) this.spec.antialias = true;
     if (!this.spec.alpha) this.spec.alpha = true;
@@ -618,12 +636,11 @@ var Renderer = function () {
     if (this.stats) return; //don't create stats more than once
     if (typeof Stats === 'undefined') {
       var msg = 'modularTHREE Error: Stats not loaded.\n';
-      msg += 'If you do not wish to show Stats set modularTHREE.config.showStats = false\n';
+      msg += 'If you do not wish to show Stats set rendererSpec.showStats = false\n';
       msg += 'Otherwise get https://raw.githubusercontent.com/mrdoob/stats.js/master/build/stats.min.js\n';
-      msg += 'and add <script src="path-to-script/stats.min.js">';
-      msg += '</script> to your <head>';
+      msg += 'and add it to your build.';
       console.error(msg);
-      showStats = false;
+      this.spec.showStats = false;
     } else {
       this.stats = new Stats();
       document.body.appendChild(this.stats.dom);
@@ -631,10 +648,10 @@ var Renderer = function () {
   };
 
   Renderer.prototype.render = function render(scene, camera, perFrameFunctions) {
-    if (showStats) this.initStats();
+    if (this.spec.showStats) this.initStats();
     if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
 
-    if (this.spec.useGSAP && this.checkGSAPScriptLoaded()) {
+    if (this.spec.useGSAP && this.checkGSAPLoaded()) {
       this.animateWithGSAP(scene, camera, perFrameFunctions);
     } else {
       this.animateWithTHREE(scene, camera, perFrameFunctions);
@@ -649,7 +666,7 @@ var Renderer = function () {
         perFrameFunctions[i]();
       }
 
-      if (showStats) _this.stats.update();
+      if (_this.spec.showStats) _this.stats.update();
       if (_this.spec.postprocessing) _this.postRenderer.composer.render();else _this.renderer.render(scene, camera);
     };
 
@@ -667,7 +684,7 @@ var Renderer = function () {
         perFrameFunctions[i]();
       }
 
-      if (showStats) _this2.stats.update();
+      if (_this2.spec.showStats) _this2.stats.update();
       if (_this2.spec.postprocessing) _this2.postRenderer.composer.render();else _this2.renderer.render(scene, camera);
     };
 
@@ -680,7 +697,7 @@ var Renderer = function () {
     this.usingGSAP = false;
   };
 
-  Renderer.prototype.checkGSAPScriptLoaded = function checkGSAPScriptLoaded() {
+  Renderer.prototype.checkGSAPLoaded = function checkGSAPLoaded() {
     if (typeof TweenLite === 'undefined') {
       var msg = 'ModularTHREE Error: GSAP not loaded.\n';
       msg += 'Attempting to use THREE for animation.\n';
@@ -695,8 +712,6 @@ var Renderer = function () {
 
   return Renderer;
 }();
-
-// import * as THREE from 'three/src/Three.js';
 
 // *****************************************************************************
 //  CAMERA CLASS
@@ -792,7 +807,6 @@ var Camera = function () {
   return Camera;
 }();
 
-// import * as THREE from 'three/src/Three.js';
 // *****************************************************************************
 //  SCENE CLASS
 //
@@ -809,7 +823,6 @@ var Scene = function () {
   }
 
   Scene.prototype.init = function init() {
-    // this.scene = new THREE.Scene();
     this.scene = new THREE.Scene();
     this.camera = new Camera(this.cameraSpec);
     this.scene.add(this.camera.cam);
@@ -861,8 +874,6 @@ var Scene = function () {
 
   return Scene;
 }();
-
-// import * as THREE from 'three/src/Three.js';
 
 //hold a reference to all drawings so that they can be reset easily
 var drawings = {};
@@ -926,39 +937,17 @@ var Drawing = function () {
   return Drawing;
 }();
 
-// import {
-//   initHeartcodeLoader,
-// }
-// from './loaders/loadingManager';
-// *****************************************************************************
-// Perform various initialisation checks and setup
-// *****************************************************************************
-var moduleName = 'ModularTHREE';
-
-var checkHeartcodeLoaded = function () {
-  if (typeof CanvasLoader === 'undefined') {
-    var msg = moduleName + ' Error: HeartcodeLoader not loaded.\n';
-    msg += 'If you do not wish to use HeartcodeLoader set ' + moduleName + '.config.useHeartcodeLoader = false\n';
-    msg += 'Otherwise get https://raw.githubusercontent.com/heartcode/';
-    msg += 'CanvasLoader/master/js/heartcode-canvasloader-min.js\n';
-    msg += 'and add <script src="path-to-script/heartcode-canvasloader-min.js">';
-    msg += '</script> to your <head>';
-    console.error(msg);
-    return false;
-  }
-  return true;
-};
-
 var init = function () {
-  if (config.showHeartcodeLoader) {
-    if (checkHeartcodeLoaded()) {
-      //initHeartcodeLoader();
-    }
-  }
-
-  //if (config.showStats) checkStatsLoaded();
-
+  if (config.useLoadingManager) modularTHREE.loadingManager = new THREE.LoadingManager();
   config.initCalled = true;
 };
 
-export { MeshObject, Drawing, init, config };
+var modularTHREE = {
+  MeshObject: MeshObject,
+  Drawing: Drawing,
+  init: init,
+  config: config,
+  loadingManager: null
+};
+
+export default modularTHREE;

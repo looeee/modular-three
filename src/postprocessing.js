@@ -1,15 +1,7 @@
-// import * as THREE from 'three/src/Three.js';
-
 // *****************************************************************************
 // POSTPROCESSING CLASS
 // Post effects for THREE.js
 // Set postprocessing = true in renderSpec for a drawing to render with post effects
-//
-//  NOTE: This currently allows only one postprocessing effect for all scenes.
-//  It will need to be subclassed to allow per scene effects
-//
-//  NOTE: the relevant postprocessing scripts will need to be included
-//  depending on what effects are used
 // *****************************************************************************
 export class Postprocessing {
   constructor(renderer, scene, camera) {
