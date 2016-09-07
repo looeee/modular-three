@@ -23,7 +23,7 @@ false);
 //
 // *****************************************************************************
 export class Drawing {
-  constructor(rendererSpec, cameraSpec) {
+  constructor(rendererSpec = {}, cameraSpec = {}) {
     this.scene = new Scene(rendererSpec, cameraSpec);
     this.camera = this.scene.camera;
 
@@ -49,6 +49,10 @@ export class Drawing {
 
   cancelRender() {
     this.scene.renderer.cancelRender();
+  }
+
+  addPostEffect(pass, uniforms) {
+    this.scene.renderer.postRenderer.addPass(pass, uniforms);
   }
 
   addPerFrameFunction(func) {

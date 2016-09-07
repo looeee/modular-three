@@ -14,14 +14,12 @@ export class Postprocessing {
   init() {
     this.composer = new THREE.EffectComposer(this.renderer);
     this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
-    this.vignette();
   }
 
-  vignette() {
-    const effectVignette = new THREE.ShaderPass(THREE.VignetteShader);
-    effectVignette.uniforms.offset.value = 0.95;
-    effectVignette.uniforms.darkness.value = 1.6;
-    effectVignette.renderToScreen = true;
-    this.composer.addPass(effectVignette);
+  addPass(pass, uniforms) {
+    const effect = new THREE.ShaderPass(pass);
+    //add uniforms here
+    effect.renderToScreen = true;
+    this.composer.addPass(effect);
   }
 }

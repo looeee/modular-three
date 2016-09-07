@@ -18,7 +18,8 @@ export class Scene {
     this.scene = new THREE.Scene();
     this.camera = new Camera(this.cameraSpec);
     this.scene.add(this.camera.cam);
-    this.renderer = new Renderer(this.rendererSpec);
+
+    this.renderer = new Renderer(this.rendererSpec, this.scene, this.camera.cam);
   }
 
   add(...objects) {
@@ -44,6 +45,6 @@ export class Scene {
   }
 
   render(perFrameFunctions) {
-    this.renderer.render(this.scene, this.camera.cam, perFrameFunctions);
+    this.renderer.render(perFrameFunctions);
   }
 }

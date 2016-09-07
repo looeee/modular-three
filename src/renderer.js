@@ -1,6 +1,42 @@
 import { config } from './config';
 import { Postprocessing } from './postprocessing';
 
+const checkStatsLoaded = () => {
+  if (typeof Stats === 'undefined') {
+    let msg = `modularTHREE Error: Stats not loaded.\n`;
+    msg += `If you do not wish to show Stats set rendererSpec.showStats = false\n`;
+    msg += 'Otherwise get https://raw.githubusercontent.com/mrdoob/stats.js/master/build/stats.min.js\n';
+    msg += 'and add it to your build.';
+    console.error(msg);
+    return false;
+  }
+  return true;
+};
+
+const checkGSAPLoaded = () => {
+  if (typeof TweenLite === 'undefined') {
+    let msg = 'ModularTHREE Error: GSAP not loaded.\n';
+    msg += 'Attempting to use THREE for animation.\n';
+    msg += 'If you do not wish to use GSAP set rendererSpec.useGSAP = false\n';
+    msg += 'Otherwise try adding <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js">';
+    msg += '</script> to your <head>';
+    console.error(msg);
+    return false;
+  }
+  return true;
+};
+
+const checkIfCanvasExists = (id) => {
+  if (document.querySelector(`#${id}`)) {
+    let msg = `Warning: an element with id ${id} already exists.\n`;
+    msg += 'Either it was created manually or you have two Drawings with the same id. \n';
+    msg += 'Rendering multiple Drawings to the same <canvas> element will cause problems.';
+    console.warn(msg);
+    return true;
+  }
+  return false;
+};
+
 // *****************************************************************************
 // RENDERER CLASS
 //
@@ -24,34 +60,34 @@ import { Postprocessing } from './postprocessing';
 // };
 // *****************************************************************************
 export class Renderer {
-  constructor(spec) {
+  constructor(spec, scene, camera) {
     this.spec = spec || {};
+    this.scene = scene;
+    this.camera = camera;
     this.init();
   }
 
   init() {
     this.initParams();
     this.initRenderer();
-
     this.setRenderer();
+
+    if (this.spec.showStats) this.initStats();
+    if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, this.scene, this.camera);
+    console.log( this.postRenderer);
   }
 
   initRenderer() {
     const rendererOptions = {
       antialias: this.spec.antialias,
-      //required for multiple scenes and various other effects
       alpha: this.spec.alpha,
     };
 
     if (this.spec.canvasID) {
-      if (document.querySelector(`#${this.spec.canvasID}`)) {
-        let msg = `Warning: an element with id ${this.spec.canvasID} already exists \n`;
-        msg += 'Perhaps it was created manually? This will cause problems if you are';
-        msg += 'trying to render multiple Drawings to the same <canvas> element.';
-        console.warn(msg);
+      if (checkIfCanvasExists(this.spec.canvasID)) {
         rendererOptions.canvas = document.querySelector(`#${this.spec.canvasID}`);
       }
-      else if (this.spec.canvasID) {
+      else {
         rendererOptions.canvas = document.createElement('canvas');
         rendererOptions.canvas.id = this.spec.canvasID;
       }
@@ -93,12 +129,7 @@ export class Renderer {
 
   initStats() {
     if (this.stats) return; //don't create stats more than once
-    if (typeof Stats === 'undefined') {
-      let msg = `modularTHREE Error: Stats not loaded.\n`;
-      msg += `If you do not wish to show Stats set rendererSpec.showStats = false\n`;
-      msg += 'Otherwise get https://raw.githubusercontent.com/mrdoob/stats.js/master/build/stats.min.js\n';
-      msg += 'and add it to your build.';
-      console.error(msg);
+    if (!checkStatsLoaded()) {
       this.spec.showStats = false;
     }
     else {
@@ -107,34 +138,31 @@ export class Renderer {
     }
   }
 
-  render(scene, camera, perFrameFunctions) {
-    if (this.spec.showStats) this.initStats();
-    if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
-
-    if (this.spec.useGSAP && this.checkGSAPLoaded()) {
-      this.animateWithGSAP(scene, camera, perFrameFunctions);
+  render(perFrameFunctions) {
+    if (this.spec.useGSAP && checkGSAPLoaded()) {
+      this.animateWithGSAP(perFrameFunctions);
     }
     else {
-      this.animateWithTHREE(scene, camera, perFrameFunctions);
+      this.animateWithTHREE(perFrameFunctions);
     }
   }
 
-  animateWithGSAP(scene, camera, perFrameFunctions) {
+  animateWithGSAP(perFrameFunctions) {
     const renderHandler = () => {
       for (let i = 0; i < perFrameFunctions.length; i++) {
         perFrameFunctions[i]();
       }
 
-      if (this.spec.showStats) this.stats.update();
-      if (this.spec.postprocessing) this.postRenderer.composer.render();
-      else this.renderer.render(scene, camera);
+      if (this.stats) this.stats.update();
+      if (this.postRenderer) this.postRenderer.composer.render();
+      else this.renderer.render(this.scene, this.camera);
     };
 
     TweenLite.ticker.addEventListener('tick', renderHandler);
     this.usingGSAP = true;
   }
 
-  animateWithTHREE(scene, camera, perFrameFunctions) {
+  animateWithTHREE(perFrameFunctions) {
     const renderHandler = () => {
       this.animationFrame = requestAnimationFrame(renderHandler);
 
@@ -142,9 +170,9 @@ export class Renderer {
         perFrameFunctions[i]();
       }
 
-      if (this.spec.showStats) this.stats.update();
-      if (this.spec.postprocessing) this.postRenderer.composer.render();
-      else this.renderer.render(scene, camera);
+      if (this.stats) this.stats.update();
+      if (this.postRenderer) this.postRenderer.composer.render();
+      else this.renderer.render(this.scene, this.camera);
     };
 
     renderHandler();
@@ -157,16 +185,4 @@ export class Renderer {
     this.usingGSAP = false;
   }
 
-  checkGSAPLoaded() {
-    if (typeof TweenLite === 'undefined') {
-      let msg = 'ModularTHREE Error: GSAP not loaded.\n';
-      msg += 'Attempting to use THREE for animation.\n';
-      msg += 'If you do not wish to use GSAP set rendererSpec.useGSAP = false\n';
-      msg += 'Otherwise try adding <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js">';
-      msg += '</script> to your <head>';
-      console.error(msg);
-      return false;
-    }
-    return true;
-  }
 }

@@ -520,19 +520,53 @@ var Postprocessing = function () {
   Postprocessing.prototype.init = function init() {
     this.composer = new THREE.EffectComposer(this.renderer);
     this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
-    this.vignette();
   };
 
-  Postprocessing.prototype.vignette = function vignette() {
-    var effectVignette = new THREE.ShaderPass(THREE.VignetteShader);
-    effectVignette.uniforms.offset.value = 0.95;
-    effectVignette.uniforms.darkness.value = 1.6;
-    effectVignette.renderToScreen = true;
-    this.composer.addPass(effectVignette);
+  Postprocessing.prototype.addPass = function addPass(pass, uniforms) {
+    var effect = new THREE.ShaderPass(pass);
+    //add uniforms here
+    effect.renderToScreen = true;
+    this.composer.addPass(effect);
   };
 
   return Postprocessing;
 }();
+
+var checkStatsLoaded = function () {
+  if (typeof Stats === 'undefined') {
+    var msg = 'modularTHREE Error: Stats not loaded.\n';
+    msg += 'If you do not wish to show Stats set rendererSpec.showStats = false\n';
+    msg += 'Otherwise get https://raw.githubusercontent.com/mrdoob/stats.js/master/build/stats.min.js\n';
+    msg += 'and add it to your build.';
+    console.error(msg);
+    return false;
+  }
+  return true;
+};
+
+var checkGSAPLoaded = function () {
+  if (typeof TweenLite === 'undefined') {
+    var msg = 'ModularTHREE Error: GSAP not loaded.\n';
+    msg += 'Attempting to use THREE for animation.\n';
+    msg += 'If you do not wish to use GSAP set rendererSpec.useGSAP = false\n';
+    msg += 'Otherwise try adding <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js">';
+    msg += '</script> to your <head>';
+    console.error(msg);
+    return false;
+  }
+  return true;
+};
+
+var checkIfCanvasExists = function (id) {
+  if (document.querySelector('#' + id)) {
+    var msg = 'Warning: an element with id ' + id + ' already exists.\n';
+    msg += 'Either it was created manually or you have two Drawings with the same id. \n';
+    msg += 'Rendering multiple Drawings to the same <canvas> element will cause problems.';
+    console.warn(msg);
+    return true;
+  }
+  return false;
+};
 
 // *****************************************************************************
 // RENDERER CLASS
@@ -557,35 +591,35 @@ var Postprocessing = function () {
 // };
 // *****************************************************************************
 var Renderer = function () {
-  function Renderer(spec) {
+  function Renderer(spec, scene, camera) {
     classCallCheck(this, Renderer);
 
     this.spec = spec || {};
+    this.scene = scene;
+    this.camera = camera;
     this.init();
   }
 
   Renderer.prototype.init = function init() {
     this.initParams();
     this.initRenderer();
-
     this.setRenderer();
+
+    if (this.spec.showStats) this.initStats();
+    if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, this.scene, this.camera);
+    console.log(this.postRenderer);
   };
 
   Renderer.prototype.initRenderer = function initRenderer() {
     var rendererOptions = {
       antialias: this.spec.antialias,
-      //required for multiple scenes and various other effects
       alpha: this.spec.alpha
     };
 
     if (this.spec.canvasID) {
-      if (document.querySelector('#' + this.spec.canvasID)) {
-        var msg = 'Warning: an element with id ' + this.spec.canvasID + ' already exists \n';
-        msg += 'Perhaps it was created manually? This will cause problems if you are';
-        msg += 'trying to render multiple Drawings to the same <canvas> element.';
-        console.warn(msg);
+      if (checkIfCanvasExists(this.spec.canvasID)) {
         rendererOptions.canvas = document.querySelector('#' + this.spec.canvasID);
-      } else if (this.spec.canvasID) {
+      } else {
         rendererOptions.canvas = document.createElement('canvas');
         rendererOptions.canvas.id = this.spec.canvasID;
       }
@@ -634,12 +668,7 @@ var Renderer = function () {
 
   Renderer.prototype.initStats = function initStats() {
     if (this.stats) return; //don't create stats more than once
-    if (typeof Stats === 'undefined') {
-      var msg = 'modularTHREE Error: Stats not loaded.\n';
-      msg += 'If you do not wish to show Stats set rendererSpec.showStats = false\n';
-      msg += 'Otherwise get https://raw.githubusercontent.com/mrdoob/stats.js/master/build/stats.min.js\n';
-      msg += 'and add it to your build.';
-      console.error(msg);
+    if (!checkStatsLoaded()) {
       this.spec.showStats = false;
     } else {
       this.stats = new Stats();
@@ -647,18 +676,15 @@ var Renderer = function () {
     }
   };
 
-  Renderer.prototype.render = function render(scene, camera, perFrameFunctions) {
-    if (this.spec.showStats) this.initStats();
-    if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, scene, camera);
-
-    if (this.spec.useGSAP && this.checkGSAPLoaded()) {
-      this.animateWithGSAP(scene, camera, perFrameFunctions);
+  Renderer.prototype.render = function render(perFrameFunctions) {
+    if (this.spec.useGSAP && checkGSAPLoaded()) {
+      this.animateWithGSAP(perFrameFunctions);
     } else {
-      this.animateWithTHREE(scene, camera, perFrameFunctions);
+      this.animateWithTHREE(perFrameFunctions);
     }
   };
 
-  Renderer.prototype.animateWithGSAP = function animateWithGSAP(scene, camera, perFrameFunctions) {
+  Renderer.prototype.animateWithGSAP = function animateWithGSAP(perFrameFunctions) {
     var _this = this;
 
     var renderHandler = function () {
@@ -666,15 +692,15 @@ var Renderer = function () {
         perFrameFunctions[i]();
       }
 
-      if (_this.spec.showStats) _this.stats.update();
-      if (_this.spec.postprocessing) _this.postRenderer.composer.render();else _this.renderer.render(scene, camera);
+      if (_this.stats) _this.stats.update();
+      if (_this.postRenderer) _this.postRenderer.composer.render();else _this.renderer.render(_this.scene, _this.camera);
     };
 
     TweenLite.ticker.addEventListener('tick', renderHandler);
     this.usingGSAP = true;
   };
 
-  Renderer.prototype.animateWithTHREE = function animateWithTHREE(scene, camera, perFrameFunctions) {
+  Renderer.prototype.animateWithTHREE = function animateWithTHREE(perFrameFunctions) {
     var _this2 = this;
 
     var renderHandler = function () {
@@ -684,8 +710,8 @@ var Renderer = function () {
         perFrameFunctions[i]();
       }
 
-      if (_this2.spec.showStats) _this2.stats.update();
-      if (_this2.spec.postprocessing) _this2.postRenderer.composer.render();else _this2.renderer.render(scene, camera);
+      if (_this2.stats) _this2.stats.update();
+      if (_this2.postRenderer) _this2.postRenderer.composer.render();else _this2.renderer.render(_this2.scene, _this2.camera);
     };
 
     renderHandler();
@@ -695,19 +721,6 @@ var Renderer = function () {
     if (this.usingGSAP) TweenLite.ticker.removeEventListener('tick', this.renderHandler);else cancelAnimationFrame(this.animationFrame);
     this.renderer.clear();
     this.usingGSAP = false;
-  };
-
-  Renderer.prototype.checkGSAPLoaded = function checkGSAPLoaded() {
-    if (typeof TweenLite === 'undefined') {
-      var msg = 'ModularTHREE Error: GSAP not loaded.\n';
-      msg += 'Attempting to use THREE for animation.\n';
-      msg += 'If you do not wish to use GSAP set rendererSpec.useGSAP = false\n';
-      msg += 'Otherwise try adding <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js">';
-      msg += '</script> to your <head>';
-      console.error(msg);
-      return false;
-    }
-    return true;
   };
 
   return Renderer;
@@ -826,7 +839,8 @@ var Scene = function () {
     this.scene = new THREE.Scene();
     this.camera = new Camera(this.cameraSpec);
     this.scene.add(this.camera.cam);
-    this.renderer = new Renderer(this.rendererSpec);
+
+    this.renderer = new Renderer(this.rendererSpec, this.scene, this.camera.cam);
   };
 
   Scene.prototype.add = function add() {
@@ -869,7 +883,7 @@ var Scene = function () {
   };
 
   Scene.prototype.render = function render(perFrameFunctions) {
-    this.renderer.render(this.scene, this.camera.cam, perFrameFunctions);
+    this.renderer.render(perFrameFunctions);
   };
 
   return Scene;
@@ -894,7 +908,9 @@ window.addEventListener('resize', throttle(function () {
 //
 // *****************************************************************************
 var Drawing = function () {
-  function Drawing(rendererSpec, cameraSpec) {
+  function Drawing() {
+    var rendererSpec = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+    var cameraSpec = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
     classCallCheck(this, Drawing);
 
     this.scene = new Scene(rendererSpec, cameraSpec);
@@ -924,6 +940,10 @@ var Drawing = function () {
 
   Drawing.prototype.cancelRender = function cancelRender() {
     this.scene.renderer.cancelRender();
+  };
+
+  Drawing.prototype.addPostEffect = function addPostEffect(pass, uniforms) {
+    this.scene.renderer.postRenderer.addPass(pass, uniforms);
   };
 
   Drawing.prototype.addPerFrameFunction = function addPerFrameFunction(func) {
