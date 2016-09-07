@@ -577,37 +577,23 @@ var checkIfCanvasExists = function (id) {
 // The container elem can be omitted if using only one scene as the default
 // will be automatically added
 //
-// The following spec object can be omitted for the following defaults
-// const rendererSpec = {
-//   containerElem: '',
-//   antialias: true,
-//   alpha: false, //true required for multiple scenes
-//   autoClear: true, //false required for multiple scenes
-//   clearColor: 0x000000,
-//   clearAlpha: 0,
-//   width: window.innerWidth,
-//   height: window.innerHeight,
-//   pixelRatio: window.devicePixelRatio,
-// };
 // *****************************************************************************
 var Renderer = function () {
   function Renderer(spec, scene, camera) {
     classCallCheck(this, Renderer);
 
-    this.spec = spec || {};
+    this.spec = spec;
     this.scene = scene;
     this.camera = camera;
     this.init();
   }
 
   Renderer.prototype.init = function init() {
-    this.initParams();
     this.initRenderer();
     this.setRenderer();
 
     if (this.spec.showStats) this.initStats();
     if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, this.scene, this.camera);
-    console.log(this.postRenderer);
   };
 
   Renderer.prototype.initRenderer = function initRenderer() {
@@ -630,25 +616,6 @@ var Renderer = function () {
     if (!this.spec.canvasID || !document.querySelector('#' + this.renderer.domElement.id)) {
       document.body.appendChild(this.renderer.domElement);
     }
-  };
-
-  Renderer.prototype.initParams = function initParams() {
-    if (!this.spec.showStats) this.spec.showStats = false;
-    if (!this.spec.postprocessing) this.spec.postprocessing = false;
-    if (!this.spec.antialias) this.spec.antialias = true;
-    if (!this.spec.alpha) this.spec.alpha = true;
-    if (!this.spec.autoClear) this.spec.autoClear = false;
-    this.spec.clearColor = this.spec.clearColor || 0x000000;
-    this.spec.clearAlpha = this.spec.clearAlpha || 1.0;
-    var w = function () {
-      return window.innerWidth;
-    };
-    this.spec.width = this.spec.width || w;
-    var h = function () {
-      return window.innerHeight;
-    };
-    this.spec.height = this.spec.height || h;
-    this.spec.pixelRatio = this.spec.pixelRatio || window.devicePixelRatio;
   };
 
   Renderer.prototype.setSize = function setSize() {
@@ -730,63 +697,25 @@ var Renderer = function () {
 //  CAMERA CLASS
 //
 //  Used by Scene class - each scene will have an associated camera class
-//
-//  The following spec is optional and can be omitted for the defaults shown
-//  const cameraSpec = {
-//    type: 'PerspectiveCamera', //Or 'OrthographicCamera'
-//    near: 10,
-//    far: -10,
-//    position: new THREE.Vector3(0, 0, 100),
-//    //PerspectiveCamera only
-//    fov: 45, //PerspectiveCamera only
-//    aspect: window.innerWidth / window.innerHeight,
-//    // OrthographicCamera only
-//    width: window.innerWidth,
-//    height: window.innerHeight,
-//  };
+// *****************************************************************************
 var Camera = function () {
   function Camera(spec) {
     classCallCheck(this, Camera);
 
-    this.spec = spec || {};
+    this.spec = spec;
+    console.log(spec);
     this.init();
+    console.log(spec);
   }
 
   Camera.prototype.init = function init() {
-    this.initParams();
-
     if (this.spec.type === 'PerspectiveCamera') {
+      console.log('obj');
       this.cam = new THREE.PerspectiveCamera();
     } else {
       this.cam = new THREE.OrthographicCamera();
     }
     this.set();
-  };
-
-  Camera.prototype.initParams = function initParams() {
-    var position = function () {
-      return new THREE.Vector3();
-    };
-    this.spec.position = this.spec.position || position;
-    this.spec.near = this.spec.near || 10;
-    this.spec.far = this.spec.far || -10;
-    this.spec.type = this.spec.type || 'PerspectiveCamera';
-    if (this.spec.type === 'PerspectiveCamera') {
-      this.spec.fov = this.spec.fov || 45;
-      var aspect = function () {
-        return window.innerWidth / window.innerHeight;
-      };
-      this.spec.aspect = this.spec.aspect || aspect;
-    } else {
-      var w = function () {
-        return window.innerWidth;
-      };
-      this.spec.width = this.spec.width || w;
-      var h = function () {
-        return window.innerHeight;
-      };
-      this.spec.height = this.spec.height || h;
-    }
   };
 
   Camera.prototype.set = function set() {
@@ -908,22 +837,70 @@ window.addEventListener('resize', throttle(function () {
 //
 // *****************************************************************************
 var Drawing = function () {
-  function Drawing() {
-    var rendererSpec = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-    var cameraSpec = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  function Drawing(rendererSpec, cameraSpec) {
     classCallCheck(this, Drawing);
 
-    this.scene = new Scene(rendererSpec, cameraSpec);
+    this.rendererSpec = rendererSpec || {};
+    this.cameraSpec = cameraSpec || {};
+    console.log(this.rendererSpec, this.cameraSpec);
+    this.initRendererSpec();
+    this.initCameraSpec();
+
+    this.scene = new Scene(this.rendererSpec, this.cameraSpec);
     this.camera = this.scene.camera;
 
     this.uuid = THREE.Math.generateUUID();
-
     drawings[this.uuid] = this;
 
     this.perFrameFunctions = [];
 
     this.init();
   }
+
+  Drawing.prototype.initRendererSpec = function initRendererSpec() {
+    if (!this.rendererSpec.showStats) this.rendererSpec.showStats = false;
+    if (!this.rendererSpec.postprocessing) this.rendererSpec.postprocessing = false;
+    if (!this.rendererSpec.antialias) this.rendererSpec.antialias = true;
+    if (!this.rendererSpec.alpha) this.rendererSpec.alpha = true;
+    if (!this.rendererSpec.autoClear) this.rendererSpec.autoClear = false;
+    if (!this.rendererSpec.clearColor) this.rendererSpec.clearColor = 0x000000;
+    this.rendererSpec.clearAlpha = this.rendererSpec.clearAlpha || 1.0;
+    var w = function () {
+      return window.innerWidth;
+    };
+    this.rendererSpec.width = this.rendererSpec.width || w;
+    var h = function () {
+      return window.innerHeight;
+    };
+    this.rendererSpec.height = this.rendererSpec.height || h;
+    this.rendererSpec.pixelRatio = this.rendererSpec.pixelRatio || window.devicePixelRatio;
+  };
+
+  Drawing.prototype.initCameraSpec = function initCameraSpec() {
+    this.cameraSpec.type = this.cameraSpec.type || 'PerspectiveCamera';
+    this.cameraSpec.near = this.cameraSpec.near || 10;
+    this.cameraSpec.far = this.cameraSpec.far || -10;
+    var p = function () {
+      return new THREE.Vector3(0, 0, 100);
+    };
+    this.cameraSpec.position = this.cameraSpec.position || p;
+    if (this.cameraSpec.type === 'PerspectiveCamera') {
+      this.cameraSpec.fov = this.cameraSpec.fov || 45;
+      var a = function () {
+        return window.innerWidth / window.innerHeight;
+      };
+      this.cameraSpec.aspect = this.cameraSpec.aspect || a;
+    } else {
+      var w = function () {
+        return window.innerWidth;
+      };
+      this.cameraSpec.width = this.cameraSpec.width || w;
+      var h = function () {
+        return window.innerHeight;
+      };
+      this.cameraSpec.height = this.cameraSpec.height || h;
+    }
+  };
 
   //gets called on window resize or other events that require recalculation of
   //object dimensions

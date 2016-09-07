@@ -12,8 +12,5 @@ postprocessing
 renderer, camera, scene
  - add methods for setting all options
 
-stats
-  - make config setting work
-
-error messages
-  - update to reflect modular import style
+autoset cameraSpec, rendererSpec
+  - doesn't render for some reason

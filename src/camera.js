@@ -2,55 +2,24 @@
 //  CAMERA CLASS
 //
 //  Used by Scene class - each scene will have an associated camera class
-//
-//  The following spec is optional and can be omitted for the defaults shown
-//  const cameraSpec = {
-//    type: 'PerspectiveCamera', //Or 'OrthographicCamera'
-//    near: 10,
-//    far: -10,
-//    position: new THREE.Vector3(0, 0, 100),
-//    //PerspectiveCamera only
-//    fov: 45, //PerspectiveCamera only
-//    aspect: window.innerWidth / window.innerHeight,
-//    // OrthographicCamera only
-//    width: window.innerWidth,
-//    height: window.innerHeight,
-//  };
+// *****************************************************************************
 export class Camera {
   constructor(spec) {
-    this.spec = spec || {};
+    this.spec = spec;
+    console.log(spec);
     this.init();
+    console.log(spec);
   }
 
   init() {
-    this.initParams();
-
     if (this.spec.type === 'PerspectiveCamera') {
+      console.log('obj');
       this.cam = new THREE.PerspectiveCamera();
     }
     else {
       this.cam = new THREE.OrthographicCamera();
     }
     this.set();
-  }
-
-  initParams() {
-    const position = () => new THREE.Vector3();
-    this.spec.position = this.spec.position || position;
-    this.spec.near = this.spec.near || 10;
-    this.spec.far = this.spec.far || -10;
-    this.spec.type = this.spec.type || 'PerspectiveCamera';
-    if (this.spec.type === 'PerspectiveCamera') {
-      this.spec.fov = this.spec.fov || 45;
-      const aspect = () => window.innerWidth / window.innerHeight;
-      this.spec.aspect = this.spec.aspect || aspect;
-    }
-    else {
-      const w = () => window.innerWidth;
-      this.spec.width = this.spec.width || w;
-      const h = () => window.innerHeight;
-      this.spec.height = this.spec.height || h;
-    }
   }
 
   set() {

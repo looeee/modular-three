@@ -46,35 +46,21 @@ const checkIfCanvasExists = (id) => {
 // The container elem can be omitted if using only one scene as the default
 // will be automatically added
 //
-// The following spec object can be omitted for the following defaults
-// const rendererSpec = {
-//   containerElem: '',
-//   antialias: true,
-//   alpha: false, //true required for multiple scenes
-//   autoClear: true, //false required for multiple scenes
-//   clearColor: 0x000000,
-//   clearAlpha: 0,
-//   width: window.innerWidth,
-//   height: window.innerHeight,
-//   pixelRatio: window.devicePixelRatio,
-// };
 // *****************************************************************************
 export class Renderer {
   constructor(spec, scene, camera) {
-    this.spec = spec || {};
+    this.spec = spec;
     this.scene = scene;
     this.camera = camera;
     this.init();
   }
 
   init() {
-    this.initParams();
     this.initRenderer();
     this.setRenderer();
 
     if (this.spec.showStats) this.initStats();
     if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, this.scene, this.camera);
-    console.log( this.postRenderer);
   }
 
   initRenderer() {
@@ -98,21 +84,6 @@ export class Renderer {
     if (!this.spec.canvasID || !document.querySelector(`#${this.renderer.domElement.id}`)) {
       document.body.appendChild(this.renderer.domElement);
     }
-  }
-
-  initParams() {
-    if (!this.spec.showStats) this.spec.showStats = false;
-    if (!this.spec.postprocessing) this.spec.postprocessing = false;
-    if (!this.spec.antialias) this.spec.antialias = true;
-    if (!this.spec.alpha) this.spec.alpha = true;
-    if (!this.spec.autoClear) this.spec.autoClear = false;
-    this.spec.clearColor = this.spec.clearColor || 0x000000;
-    this.spec.clearAlpha = this.spec.clearAlpha || 1.0;
-    const w = () => window.innerWidth;
-    this.spec.width = this.spec.width || w;
-    const h = () => window.innerHeight;
-    this.spec.height = this.spec.height || h;
-    this.spec.pixelRatio = this.spec.pixelRatio || window.devicePixelRatio;
   }
 
   setSize(w = this.spec.width(), h = this.spec.height()) {
