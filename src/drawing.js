@@ -42,36 +42,32 @@ export class Drawing {
   }
 
   initRendererSpec() {
-    if (!this.rendererSpec.showStats) this.rendererSpec.showStats = false;
-    if (!this.rendererSpec.postprocessing) this.rendererSpec.postprocessing = false;
-    if (!this.rendererSpec.antialias) this.rendererSpec.antialias = true;
-    if (!this.rendererSpec.alpha) this.rendererSpec.alpha = true;
-    if (!this.rendererSpec.autoClear) this.rendererSpec.autoClear = false;
-    if (!this.rendererSpec.clearColor) this.rendererSpec.clearColor = 0x000000;
-    this.rendererSpec.clearAlpha = this.rendererSpec.clearAlpha || 1.0;
-    const w = () => window.innerWidth;
-    this.rendererSpec.width = this.rendererSpec.width || w;
-    const h = () => window.innerHeight;
-    this.rendererSpec.height = this.rendererSpec.height || h;
-    this.rendererSpec.pixelRatio = this.rendererSpec.pixelRatio || window.devicePixelRatio;
+    if (this.rendererSpec.showStats === undefined) this.rendererSpec.showStats = false;
+    if (this.rendererSpec.useGSAP === undefined) this.rendererSpec.useGSAP = false;
+    if (this.rendererSpec.postprocessing === undefined) this.rendererSpec.postprocessing = false;
+    if (this.rendererSpec.antialias === undefined) this.rendererSpec.antialias = true;
+    if (this.rendererSpec.alpha === undefined) this.rendererSpec.alpha = true;
+    if (this.rendererSpec.autoClear === undefined) this.rendererSpec.autoClear = true;
+    if (this.rendererSpec.clearColor === undefined) this.rendererSpec.clearColor = 0x000000;
+    if (this.rendererSpec.clearAlph === undefined) this.rendererSpec.clearAlpha = 1.0;
+    if (this.rendererSpec.width === undefined) this.rendererSpec.width = () => window.innerWidth;
+    if (this.rendererSpec.height === undefined) this.rendererSpec.height = () => window.innerHeight;
+    if (this.rendererSpec.pixelRatio === undefined) this.rendererSpec.pixelRatio = window.devicePixelRatio;
   }
 
   initCameraSpec() {
-    this.cameraSpec.type = this.cameraSpec.type || 'PerspectiveCamera';
-    this.cameraSpec.near = this.cameraSpec.near || 10;
-    this.cameraSpec.far = this.cameraSpec.far || -10;
-    const p = () => new THREE.Vector3(0, 0, 100);
-    this.cameraSpec.position = this.cameraSpec.position || p;
+    if (this.cameraSpec.type === undefined) this.cameraSpec.type = 'PerspectiveCamera';
+    if (this.cameraSpec.near === undefined) this.cameraSpec.near = 10;
+    if (this.cameraSpec.far === undefined) this.cameraSpec.far = -10;
+    if (this.cameraSpec.position === undefined) this.cameraSpec.position = new THREE.Vector3(0, 0, 100);
+
     if (this.cameraSpec.type === 'PerspectiveCamera') {
-      this.cameraSpec.fov = this.cameraSpec.fov || 45;
-      const a = () => window.innerWidth / window.innerHeight;
-      this.cameraSpec.aspect = this.cameraSpec.aspect || a;
+      if (this.cameraSpec.fov === undefined) this.cameraSpec.fov = 45;
+      if (this.cameraSpec.aspect === undefined) this.cameraSpec.aspect = () => window.innerWidth / window.innerHeight;
     }
     else {
-      const w = () => window.innerWidth;
-      this.cameraSpec.width = this.cameraSpec.width || w;
-      const h = () => window.innerHeight;
-      this.cameraSpec.height = this.cameraSpec.height || h;
+      if (this.cameraSpec.width === undefined) this.cameraSpec.width = () => window.innerWidth;
+      if (this.cameraSpec.height === undefined) this.cameraSpec.height = () => window.innerHeight;
     }
   }
 

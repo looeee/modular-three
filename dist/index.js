@@ -858,47 +858,41 @@ var Drawing = function () {
   }
 
   Drawing.prototype.initRendererSpec = function initRendererSpec() {
-    if (!this.rendererSpec.showStats) this.rendererSpec.showStats = false;
-    if (!this.rendererSpec.postprocessing) this.rendererSpec.postprocessing = false;
-    if (!this.rendererSpec.antialias) this.rendererSpec.antialias = true;
-    if (!this.rendererSpec.alpha) this.rendererSpec.alpha = true;
-    if (!this.rendererSpec.autoClear) this.rendererSpec.autoClear = false;
-    if (!this.rendererSpec.clearColor) this.rendererSpec.clearColor = 0x000000;
-    this.rendererSpec.clearAlpha = this.rendererSpec.clearAlpha || 1.0;
-    var w = function () {
+    if (this.rendererSpec.showStats === undefined) this.rendererSpec.showStats = false;
+    if (this.rendererSpec.useGSAP === undefined) this.rendererSpec.useGSAP = false;
+    if (this.rendererSpec.postprocessing === undefined) this.rendererSpec.postprocessing = false;
+    if (this.rendererSpec.antialias === undefined) this.rendererSpec.antialias = true;
+    if (this.rendererSpec.alpha === undefined) this.rendererSpec.alpha = true;
+    if (this.rendererSpec.autoClear === undefined) this.rendererSpec.autoClear = true;
+    if (this.rendererSpec.clearColor === undefined) this.rendererSpec.clearColor = 0x000000;
+    if (this.rendererSpec.clearAlph === undefined) this.rendererSpec.clearAlpha = 1.0;
+    if (this.rendererSpec.width === undefined) this.rendererSpec.width = function () {
       return window.innerWidth;
     };
-    this.rendererSpec.width = this.rendererSpec.width || w;
-    var h = function () {
+    if (this.rendererSpec.height === undefined) this.rendererSpec.height = function () {
       return window.innerHeight;
     };
-    this.rendererSpec.height = this.rendererSpec.height || h;
-    this.rendererSpec.pixelRatio = this.rendererSpec.pixelRatio || window.devicePixelRatio;
+    if (this.rendererSpec.pixelRatio === undefined) this.rendererSpec.pixelRatio = window.devicePixelRatio;
   };
 
   Drawing.prototype.initCameraSpec = function initCameraSpec() {
-    this.cameraSpec.type = this.cameraSpec.type || 'PerspectiveCamera';
-    this.cameraSpec.near = this.cameraSpec.near || 10;
-    this.cameraSpec.far = this.cameraSpec.far || -10;
-    var p = function () {
-      return new THREE.Vector3(0, 0, 100);
-    };
-    this.cameraSpec.position = this.cameraSpec.position || p;
+    if (this.cameraSpec.type === undefined) this.cameraSpec.type = 'PerspectiveCamera';
+    if (this.cameraSpec.near === undefined) this.cameraSpec.near = 10;
+    if (this.cameraSpec.far === undefined) this.cameraSpec.far = -10;
+    if (this.cameraSpec.position === undefined) this.cameraSpec.position = new THREE.Vector3(0, 0, 100);
+
     if (this.cameraSpec.type === 'PerspectiveCamera') {
-      this.cameraSpec.fov = this.cameraSpec.fov || 45;
-      var a = function () {
+      if (this.cameraSpec.fov === undefined) this.cameraSpec.fov = 45;
+      if (this.cameraSpec.aspect === undefined) this.cameraSpec.aspect = function () {
         return window.innerWidth / window.innerHeight;
       };
-      this.cameraSpec.aspect = this.cameraSpec.aspect || a;
     } else {
-      var w = function () {
+      if (this.cameraSpec.width === undefined) this.cameraSpec.width = function () {
         return window.innerWidth;
       };
-      this.cameraSpec.width = this.cameraSpec.width || w;
-      var h = function () {
+      if (this.cameraSpec.height === undefined) this.cameraSpec.height = function () {
         return window.innerHeight;
       };
-      this.cameraSpec.height = this.cameraSpec.height || h;
     }
   };
 
