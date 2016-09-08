@@ -59,7 +59,9 @@ Show FPS and other stats on screen. If you haved installed THREE as an npm modul
 Usage
 ------
 
-The following instructions are heavily biased to using [Rollup](http://rollupjs.org/) and [Babel](https://babeljs.io/) as build tools. Rollup will require the ```rollup-plugin-node-resolve``` and ```rollup-plugin-commonjs``` plugins to allow importing of THREE, GSAP and other npm modules. See [**Modular THREE Boilerplate**](https://github.com/looeee/modular-three-boilerplate) for a ready to go build setup.
+#### Preliminary Setup ####
+
+**NOTE:** The following instructions are heavily biased to using [Rollup](http://rollupjs.org/) and [Babel](https://babeljs.io/) as build tools. Rollup will require the ```rollup-plugin-node-resolve``` and ```rollup-plugin-commonjs``` plugins to allow importing of THREE, GSAP and other npm modules. See [**Modular THREE Boilerplate**](https://github.com/looeee/modular-three-boilerplate) for a ready to go build setup. If you don't use a build tool or use different ones you will need to make some adjustments.
 
 If your are using THREE as an npm module, include it in any files that use it:
 ```js
@@ -81,10 +83,18 @@ import modularTHREE from 'modular-three';
 window.modularTHREE = modularTHREE;
 ```
 
-Important Note
-------
+Next set config settings and call ```init()```:
 
-THREE.js has recently (as of r80) switched to a modular build. This allows you to include it with an import statement as above.
+```js
+modularTHREE.config.useLoadingManager = true;
+
+//Run init() AFTER setting config options
+modularTHREE.init();
+```
+
+#### Important Note ####
+
+THREE.js has recently (as of r80) switched to a modular build. This allows you to include it with an import statement as above. However most of the plugins (stats being an exception) are not built as modules. This means you will need to include THREE first, then load any THREE plugins (e.g. postprocessing effects, controls etc.) as scripts, then finally load the script containing your code. It's not ideal, but hopefully this will change in the near future.
 
 #### Creating a drawing ####
 
@@ -113,8 +123,6 @@ class ExampleDrawing extends modularTHREE.Drawing {
 Next instantiate your ```Drawing``` and call it's ```render()``` function.
 ```js
 const exampleDrawing = new ExampleDrawing();
-//If you are passing in a rendererSpec, cameraSpec do this instead:
-//const exampleDrawing = new ExampleDrawing(rendererSpec, cameraSpec);
 
 exampleDrawing.render();
 }
@@ -131,17 +139,18 @@ which have following options. If they are omitted the defaults shown will be use
 
 ```js
 const rendererSpec = {
-  canvasID: '',
+  canvasID: 'testDrawing',
   antialias: true,
   alpha: true, //true required for multiple scenes
   autoClear: true, //false required for multiple scenes
-  clearColor: 0x000000,
-  clearAlpha: 0,
+  clearColor: 0x6858bb,
+  clearAlpha: 1.0,
   width: () => window.innerWidth,
   height: () => window.innerHeight,
   pixelRatio: window.devicePixelRatio,
   postprocessing: false,
-  useGSAP: false, //whether to use GSAP for animation
+  useGSAP: true,
+  showStats: true,
 };
 ```
 
@@ -154,7 +163,7 @@ const cameraSpec = {
   far: -10,
   position: new THREE.Vector3(0, 0, 100),
   //PerspectiveCamera only
-  fov: 45, //PerspectiveCamera only
+  fov: 45,
   aspect: () => window.innerWidth / window.innerHeight,
   // OrthographicCamera only
   width: () => window.innerWidth,
@@ -162,18 +171,15 @@ const cameraSpec = {
 };
 ```
 
-Note also that ```width```, ```height``` and ```aspect``` are passed in as functions.
+Note also that ```width```, ```height``` and ```aspect``` **must** be passed in as functions.
 This is because they are generally based on window dimensions, and this approach allows
 them to be recalculated on window resize.
 
-```rendererSpec``` and ```cameraSpec``` cover the minimal amount of options that **must** be set for every THREE scene. The ability to set all scene/camera/renderer options will be added in a future update.
+```rendererSpec``` and ```cameraSpec``` cover the minimal amount of options that need to be set for every THREE scene. The ability to set all scene/camera/renderer options will be added in a future update.
 
 #### Adding Objects to the Drawing ####
-ModularTHREE currently provides the MeshObject class, which interfaces with the [THREE.LoadingManager](http://threejs.org/docs/?q=loading#Reference/Loaders/LoadingManager),
-which can be used to provide a loading overlay, using for example  [**HeartcodeLoader**](https://github.com/heartcode/CanvasLoader),
-or you own custom loader.
 
-MeshObjects can be created like so:
+We'll create a standard ```MeshObjects``` next:
 
 ```js
 class Cube extends modularTHREE.MeshObject {
@@ -182,14 +188,14 @@ class Cube extends modularTHREE.MeshObject {
   }
 
   init() {
-    const geometry = new THREE.BoxGeometry(20, 20, 20);
+    const geometry = new THREE.BoxBufferGeometry(20, 20, 20);
     const material = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
     this.mesh = new THREE.Mesh(geometry, material);
   }
 }
 ```
 
-Again the **spec** object is optional, but can be used to pass in variables such as material, dimensions etc.
+Again the **spec** object is optional, but can be used to pass in variables such as layers (a recent and largely undocumented THREE feature), or your own parameters.
 
 Next, update the ```init()``` function of your ```Drawing``` class to instantiate the cube.
 
@@ -305,7 +311,75 @@ initObjects() {
 
 #### Postprocessing ####
 
-Forthcoming...
+THREE ships with several postprocessing examples. They are not included as part of the main build, and they are not written as modules, so they must be added to your page **after** THREE has loaded. The simplest way to add them is to include them in ```<script>``` tags.
+
+**Note:** These effects are not well documented and are written by various people, so use them at your own risk and be prepared to read through the code to see how they work!
+
+To start we'll need to include the following (assuming you are using THREE as an npm module and loading them from there):
+
+```html
+<script src="node_modules\three\examples\js\shaders\CopyShader.js"></script>
+<script src="node_modules\three\examples\js\postprocessing\EffectComposer.js"></script>
+<script src="node_modules\three\examples\js\postprocessing\ShaderPass.js"></script>
+<script src="node_modules\three\examples\js\postprocessing\RenderPass.js"></script>
+```
+
+Lets add the DigitalGlitch effect and the Kaleidoscope and Vignette shaders. Add the following ```<scripts>```:
+
+```html
+<script src="node_modules\three\examples\js\shaders\KaleidoShader.js"></script>
+<script src="node_modules\three\examples\js\shaders\VignetteShader.js"></script>
+<script src="node_modules\three\examples\js\shaders\DigitalGlitch.js"></script>
+<script src="node_modules\three\examples\js\postprocessing\GlitchPass.js"></script>
+```
+
+Inspecting the ```VignetteShader.js``` file we see the following ```uniforms```:
+
+```js
+uniforms: {
+
+  "tDiffuse": { value: null },
+  "offset":   { value: 1.0 },
+  "darkness": { value: 1.0 }
+
+},
+```
+
+If you are not familiar with GLSL shader language, just think of these as options. The default darkness will not be very visible so we'll set this below.
+
+Update your ```Drawing``` class to include these:
+
+```js
+class TestDrawing extends modularTHREE.Drawing {
+  constructor() {
+    super(rendererSpec, cameraSpec);
+  }
+
+  init() {
+    this.initObjects();
+    this.initAnimations();
+    this.initPostprocessing();
+  }
+
+  initObjects() { ... }
+
+  initAnimations() { ... }
+
+  initPostprocessing() {
+    if (!this.rendererSpec.postprocessing) return;
+    this.addPostShader(THREE.KaleidoShader);
+    this.addPostShader(THREE.VignetteShader, {
+      darkness: 10.0,
+    });
+
+    this.addPostEffect(new THREE.GlitchPass());
+  }
+}
+```
+
+As you can see ```addPostShader()``` has an optional second argument in which you can set the uniforms for that shader.
+
+Nothing will have happened yet, as we haven't set ```rendererSpec.postprocessing = true;```. Do this now, and while you're at it set ```rendererSpec.clearColor = 0x6858bb;``` so that you can see the postprocessing effects more clearly.
 
 #### Using custom loaders with the THREE.LoadingManager ####
 
