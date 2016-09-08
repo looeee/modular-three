@@ -520,13 +520,41 @@ var Postprocessing = function () {
   Postprocessing.prototype.init = function init() {
     this.composer = new THREE.EffectComposer(this.renderer);
     this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
+    this.composer.passes[0].renderToScreen = true;
   };
 
-  Postprocessing.prototype.addPass = function addPass(pass, uniforms) {
-    var effect = new THREE.ShaderPass(pass);
-    //add uniforms here
-    effect.renderToScreen = true;
+  Postprocessing.prototype.addShader = function addShader(shader) {
+    var uniforms = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+    var pass = new THREE.ShaderPass(shader);
+
+    Object.keys(uniforms).forEach(function (key) {
+      pass.uniforms[key].value = uniforms[key];
+    });
+    this.composer.addPass(pass);
+    this.setRenderToScreen();
+  };
+
+  Postprocessing.prototype.addEffect = function addEffect(effect) {
     this.composer.addPass(effect);
+    this.setRenderToScreen();
+  };
+
+  //Set renderToScreen = true for the last effect added
+
+
+  Postprocessing.prototype.setRenderToScreen = function setRenderToScreen() {
+    var len = this.composer.passes.length;
+    this.composer.passes[len - 2].renderToScreen = false;
+    this.composer.passes[len - 1].renderToScreen = true;
+  };
+
+  Postprocessing.prototype.reset = function reset() {
+    this.composer.reset();
+  };
+
+  Postprocessing.prototype.render = function render() {
+    this.composer.render();
   };
 
   return Postprocessing;
@@ -660,7 +688,7 @@ var Renderer = function () {
       }
 
       if (_this.stats) _this.stats.update();
-      if (_this.postRenderer) _this.postRenderer.composer.render();else _this.renderer.render(_this.scene, _this.camera);
+      if (_this.postRenderer) _this.postRenderer.render();else _this.renderer.render(_this.scene, _this.camera);
     };
 
     TweenLite.ticker.addEventListener('tick', renderHandler);
@@ -678,7 +706,7 @@ var Renderer = function () {
       }
 
       if (_this2.stats) _this2.stats.update();
-      if (_this2.postRenderer) _this2.postRenderer.composer.render();else _this2.renderer.render(_this2.scene, _this2.camera);
+      if (_this2.postRenderer) _this2.postRenderer.render();else _this2.renderer.render(_this2.scene, _this2.camera);
     };
 
     renderHandler();
@@ -703,14 +731,11 @@ var Camera = function () {
     classCallCheck(this, Camera);
 
     this.spec = spec;
-    console.log(spec);
     this.init();
-    console.log(spec);
   }
 
   Camera.prototype.init = function init() {
     if (this.spec.type === 'PerspectiveCamera') {
-      console.log('obj');
       this.cam = new THREE.PerspectiveCamera();
     } else {
       this.cam = new THREE.OrthographicCamera();
@@ -823,12 +848,12 @@ var drawings = {};
 
 var resetDrawings = function () {
   Object.keys(drawings).forEach(function (key) {
-    drawings[key].reset();
+    return drawings[key].reset();
   });
 };
 
 window.addEventListener('resize', throttle(function () {
-  resetDrawings();
+  return resetDrawings();
 }, 500), false);
 
 // *****************************************************************************
@@ -842,7 +867,6 @@ var Drawing = function () {
 
     this.rendererSpec = rendererSpec || {};
     this.cameraSpec = cameraSpec || {};
-    console.log(this.rendererSpec, this.cameraSpec);
     this.initRendererSpec();
     this.initCameraSpec();
 
@@ -913,8 +937,12 @@ var Drawing = function () {
     this.scene.renderer.cancelRender();
   };
 
-  Drawing.prototype.addPostEffect = function addPostEffect(pass, uniforms) {
-    this.scene.renderer.postRenderer.addPass(pass, uniforms);
+  Drawing.prototype.addPostShader = function addPostShader(shader, uniforms, renderToScreen) {
+    this.scene.renderer.postRenderer.addShader(shader, uniforms, renderToScreen);
+  };
+
+  Drawing.prototype.addPostEffect = function addPostEffect(effect, renderToScreen) {
+    this.scene.renderer.postRenderer.addEffect(effect, renderToScreen);
   };
 
   Drawing.prototype.addPerFrameFunction = function addPerFrameFunction(func) {

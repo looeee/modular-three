@@ -125,7 +125,7 @@ export class Renderer {
       }
 
       if (this.stats) this.stats.update();
-      if (this.postRenderer) this.postRenderer.composer.render();
+      if (this.postRenderer) this.postRenderer.render();
       else this.renderer.render(this.scene, this.camera);
     };
 
@@ -142,7 +142,7 @@ export class Renderer {
       }
 
       if (this.stats) this.stats.update();
-      if (this.postRenderer) this.postRenderer.composer.render();
+      if (this.postRenderer) this.postRenderer.render();
       else this.renderer.render(this.scene, this.camera);
     };
 

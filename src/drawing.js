@@ -5,16 +5,11 @@ import { Scene } from './scene';
 const drawings = {};
 
 const resetDrawings = () => {
-  Object.keys(drawings)
-    .forEach((key) => {
-      drawings[key].reset();
-    });
+  Object.keys(drawings).forEach((key) => drawings[key].reset());
 };
 
 window.addEventListener('resize',
-  throttle(() => {
-    resetDrawings();
-  }, 500),
+  throttle(() => resetDrawings(), 500),
 false);
 
 // *****************************************************************************
@@ -26,7 +21,6 @@ export class Drawing {
   constructor(rendererSpec, cameraSpec) {
     this.rendererSpec = rendererSpec || {};
     this.cameraSpec = cameraSpec || {};
-    console.log(this.rendererSpec, this.cameraSpec);
     this.initRendererSpec();
     this.initCameraSpec();
 
@@ -86,8 +80,12 @@ export class Drawing {
     this.scene.renderer.cancelRender();
   }
 
-  addPostEffect(pass, uniforms) {
-    this.scene.renderer.postRenderer.addPass(pass, uniforms);
+  addPostShader(shader, uniforms, renderToScreen) {
+    this.scene.renderer.postRenderer.addShader(shader, uniforms, renderToScreen);
+  }
+
+  addPostEffect(effect, renderToScreen) {
+    this.scene.renderer.postRenderer.addEffect(effect, renderToScreen);
   }
 
   addPerFrameFunction(func) {

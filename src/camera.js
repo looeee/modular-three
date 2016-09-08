@@ -6,14 +6,11 @@
 export class Camera {
   constructor(spec) {
     this.spec = spec;
-    console.log(spec);
     this.init();
-    console.log(spec);
   }
 
   init() {
     if (this.spec.type === 'PerspectiveCamera') {
-      console.log('obj');
       this.cam = new THREE.PerspectiveCamera();
     }
     else {

@@ -12,6 +12,3 @@ postprocessing
 
 renderer, camera, scene
  - add methods for setting all options
-
-autoset cameraSpec, rendererSpec
-  - doesn't render for some reason
