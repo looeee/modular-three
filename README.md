@@ -1,13 +1,13 @@
-Modular THREE.js [![NPM version][npm-image]][npm-url]
+ModularTHREE [![NPM version][npm-image]][npm-url]
 ========
 
 ModularTHREE simplifies the creation of [**THREE.js**](http://threejs.org/) based [**WebGL**](https://en.wikipedia.org/wiki/WebGL) scenes written in **ES2015**. In particular it handles:
 
-* Basic scene setup
+* Basic scene setup with intelligent defaults
 * Resizing your scene when the window is resized
 * [Memoization](https://en.wikipedia.org/wiki/Memoization) of scene assets such as models and textures
-* Advanced animation using [**GSAP**](http://greensock.com/gsap)
 
+**ModularTHREE** is designed to be used with build tools such as Rollup, Babel etc, however it should work fine if you use the old method of including ```<script>``` files in your ```<head>```.
 
 To see it in action check out [**Modular THREE Boilerplate**](https://github.com/looeee/modular-three-boilerplate),
 which includes a [Gulp](http://gulpjs.com/) setup for compiling ES2015 with
@@ -19,60 +19,72 @@ or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/livereload/) liverel
 plugins.
 
 
-### NOTE: This is a very early build. Features are changing rapidly and this readme may be out of date ###
+### NOTE: This is a very early build. Features are changing rapidly and this readme may be out of date. You probably shouldn't use this yet. ###
 
 Installation
 ------
 
-Run
 ```sh
 $ npm install --save modular-three
 ```
 from your project root folder.
 
+Requirements
+------
+####[**THREE.js**](http://threejs.org/)
+```sh
+$ npm install --save three
+```
+and include THREE in your build, or add ```<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.min.js"></script>``` to your ```<head>```.
+
 Optional Addons
 ------
 
 ####[**GSAP**](http://greensock.com/gsap) for animation / tweening. ####
-Add this to your ```<head>```:
 
- ```<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js">```
+```sh
+$ npm install --save gsap
+```
+and include GSAP in your build, or add ```<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js">``` to your ```<head>```.
 
 [**GSAP**](http://greensock.com/gsap) is a powerful animation library which allows
 for the creation of much more complex animation than is possible using THREE alone.
 
 See the animation section below for detailed instructions.
 
-#### [**HeartcodeLoader**](https://github.com/heartcode/CanvasLoader) ####
-Show a customizeable loading spinner while models / textures are loading.
-To enable it set ```modularTHREE.config.useHeartcodeLoader = true``` before calling ```modularTHREE.init();```
-and include
-```https://github.com/heartcode/CanvasLoader/blob/master/js/heartcode-canvasloader-min.js``` in your ```<head>```.
-
 #### [**Stats**](https://github.com/mrdoob/stats.js/) ####
-Show FPS and other stats on screen. To enable it set ```modularTHREE.config.showStats = true```
-before calling ```modularTHREE.init();``` and include
-```https://github.com/mrdoob/stats.js/blob/master/src/Stats.js``` in your ```<head>```.
-
-
-If you are showing **stats** or the **heartcodeLoader** set the following config options
-and run ```modularTHREE.init()``` before doing anything else:
-```js
-modularTHREE.config.showStats = true;
-modularTHREE.config.showHeartcodeLoader = true;
-
-modularTHREE.init();
-```
+Show FPS and other stats on screen. If you haved installed THREE as an npm module you can include  ```three/examples/js/libs/stats.min``` in your build, otherwise add
+```https://github.com/mrdoob/stats.js/blob/master/src/Stats.js``` to your ```<head>```.
 
 Usage
 ------
 
-First include **modularTHREE** at the start of any files that use it like so:
+The following instructions are heavily biased to using [Rollup](http://rollupjs.org/) and [Babel](https://babeljs.io/) as build tools. Rollup will require the ```rollup-plugin-node-resolve``` and ```rollup-plugin-commonjs``` plugins to allow importing of THREE, GSAP and other npm modules. See [**Modular THREE Boilerplate**](https://github.com/looeee/modular-three-boilerplate) for a ready to go build setup.
+
+If your are using THREE as an npm module, include it in any files that use it:
 ```js
-import * as modularTHREE from 'modular-three';
+import THREE from 'three';
 ```
 
-This will also add THREE as a global object, so you can now use all THREE functions as normal.
+Then include **modularTHREE** at the start of any files that use it like so:
+```js
+import modularTHREE from 'modular-three';
+```
+
+Alternately if you want to just do these imports once, expose these variables globally:
+
+```js
+import THREE from 'three';
+window.THREE = THREE;
+
+import modularTHREE from 'modular-three';
+window.modularTHREE = modularTHREE;
+```
+
+Important Note
+------
+
+THREE.js has recently (as of r80) switched to a modular build. This allows you to include it with an import statement as above.
 
 #### Creating a drawing ####
 

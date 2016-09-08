@@ -1,14 +1,13 @@
-Loading manager functionality:
- - switch loader to https://github.com/jovey-zheng/loader
-
 Loaders
  - textureLoader
   - add updateTexture()
  - test obj loader
  - test adding random loaders
 
-postprocessing
-  - implement multiple shaders and uniforms
-
 renderer, camera, scene
  - add methods for setting all options
+
+controls
+ - add control methods
+
+commonjs bundle
