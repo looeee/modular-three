@@ -35,16 +35,4 @@ export class Camera {
     this.cam.far = this.spec.far;
     this.cam.updateProjectionMatrix();
   }
-
-  enableLayer(n) {
-    this.cam.layers.enable(n);
-  }
-
-  disableLayer(n) {
-    this.cam.layers.disable(n);
-  }
-
-  toggleLayer(n) {
-    this.cam.layers.toggle(n);
-  }
 }

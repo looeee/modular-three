@@ -9,26 +9,44 @@ let loader = null;
 
 const models = {};
 
-export function objectLoader(spec) {
+const setupLoader = () => {
   if (!loader) {
     if (modularTHREE.config.useLoadingManager) {
       loader = new THREE.ObjectLoader(modularTHREE.loadingManager);
     }
     else loader = new THREE.ObjectLoader();
   }
+};
 
-  if (!models[spec.url]) {
-    loader.load(spec.url, (mesh) => {
-      if (spec.normalize) {
-        mesh.geometry.normalize();
-      }
-      mesh.position.copy(spec.position);
-      mesh.scale.copy(spec.scale);
-      spec.scene.add(mesh);
-      models[spec.url] = mesh;
+// The exporter currently exports a scene object rather than just a single
+// mesh; traverse the loadedObject and find this mesh
+const getMesh = (loadedObject) => {
+  let mesh;
+  loadedObject.traverse( function( object ) {
+    if (object instanceof THREE.Mesh){
+      mesh = object;
+      mesh.animations = loadedObject.animations;
+    }
+  });
+
+  if (mesh == undefined) {
+    console.warn(`${url} does not contain a THREE.Mesh.`);
+  }
+  return mesh;
+}
+
+export function objectLoader(url, callback) {
+  setupLoader();
+
+  if (!models[url]) {
+    loader.load(url, (loadedObject) => {
+      //models[url] = getMesh(loadedObject);
+      models[url] = loadedObject;
+      callback(models[url]);
     });
   }
+
   else {
-    spec.scene.add(models[spec.url]);
+    callback(models[url]);
   }
 }

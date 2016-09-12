@@ -11,3 +11,8 @@ controls
  - add control methods
 
 commonjs bundle
+
+Move Scene functions to Drawing Class
+
+object loader
+  enumerate and test with object types

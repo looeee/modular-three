@@ -1,5 +1,7 @@
 import throttle from 'lodash-es/throttle';
-import { Scene } from './scene';
+import { Renderer } from './renderer';
+import { Camera } from './camera';
+import { objectLoader } from './loaders/objectLoader';
 
 //hold a reference to all drawings so that they can be reset easily
 const drawings = {};
@@ -24,13 +26,13 @@ export class Drawing {
     this.initRendererSpec();
     this.initCameraSpec();
 
-    this.scene = new Scene(this.rendererSpec, this.cameraSpec);
-    this.camera = this.scene.camera;
-
     this.uuid = THREE.Math.generateUUID();
     drawings[this.uuid] = this;
 
     this.perFrameFunctions = [];
+
+    this.initCamera()
+    this.initScene();
 
     this.init();
   }
@@ -65,19 +67,67 @@ export class Drawing {
     }
   }
 
+  initScene() {
+    this.scene = new THREE.Scene();
+
+    this.scene.add(this.camera);
+
+    this.renderer = new Renderer(this.rendererSpec, this.scene, this.camera);
+  }
+
+  initCamera() {
+    if(!this.camera) {
+      if (this.cameraSpec.type === 'PerspectiveCamera') {
+        this.camera = new THREE.PerspectiveCamera();
+      }
+      else {
+        this.camera = new THREE.OrthographicCamera();
+      }
+    }
+
+    if (this.cameraSpec.type === 'PerspectiveCamera') {
+      this.camera.fov = this.cameraSpec.fov;
+      this.camera.aspect = this.cameraSpec.aspect();
+    }
+    else {
+      this.camera.left = -this.cameraSpec.width() / 2;
+      this.camera.right = this.cameraSpec.width() / 2;
+      this.camera.top = this.cameraSpec.height() / 2;
+      this.camera.bottom = -this.cameraSpec.height() / 2;
+    }
+    this.camera.position.copy(this.cameraSpec.position);
+    this.camera.near = this.cameraSpec.near;
+    this.camera.far = this.cameraSpec.far;
+    this.camera.updateProjectionMatrix();
+  }
+
+  add(...objects) {
+    for (const object of objects) {
+      this.scene.add(object);
+    }
+  }
+
   //gets called on window resize or other events that require recalculation of
   //object dimensions
   reset() {
-    this.scene.reset();
+    this.clearScene();
+    this.camera.set();
+    this.renderer.setSize();
     this.init();
   }
 
-  render() {
-    this.scene.render(this.perFrameFunctions);
+  clearScene() {
+    for (let i = this.scene.children.length - 1; i >= 0; i--) {
+      this.scene.remove(this.scene.children[i]);
+    }
   }
 
   cancelRender() {
-    this.scene.renderer.cancelRender();
+    this.renderer.cancelRender();
+  }
+
+  render() {
+    this.renderer.render(this.perFrameFunctions);
   }
 
   addPostShader(shader, uniforms, renderToScreen) {
@@ -95,5 +145,27 @@ export class Drawing {
       msg += 'Attempting to add something that is not a function!';
       console.error(msg);
     }
+  }
+
+
+  loadObject(url, callback) {
+    if (callback === undefined) callback = (object) => {
+      this.add(object);
+    }
+    return objectLoader(url, callback);
+  }
+
+  initClock() {
+    if(!this.clock) this.clock = new THREE.Clock();
+  }
+
+  initMixer() {
+    this.initClock();
+
+    if (!this.mixer) this.mixer = new THREE.AnimationMixer(this.scene);
+
+    this.addPerFrameFunction(() => {
+      this.mixer.update(this.clock.getDelta());
+    });
   }
 }
