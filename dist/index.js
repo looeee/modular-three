@@ -1,3 +1,9 @@
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global.modularTHREE = factory());
+}(this, (function () { 'use strict';
+
 // *****************************************************************************
 //  Texture Loader
 //  includes simple memoization to ensure
@@ -24,6 +30,24 @@ var classCallCheck = function (instance, Constructor) {
     throw new TypeError("Cannot call a class as a function");
   }
 };
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
 
 // *****************************************************************************
 // MESH OBJECT SUPERCLASS
@@ -739,19 +763,37 @@ var setupLoader = function () {
   }
 };
 
-function objectLoader(url, callback) {
+var promiseLoader = function (url) {
+  return new Promise(function (resolve, reject) {
+    if (!models[url]) loader$1.load(url, resolve);else resolve(models[url]);
+  });
+};
+
+function objectLoader(url) {
   setupLoader();
 
-  if (!models[url]) {
-    loader$1.load(url, function (loadedObject) {
-      //models[url] = getMesh(loadedObject);
-      models[url] = loadedObject;
-      callback(models[url]);
-    });
-  } else {
-    callback(models[url]);
-  }
+  return promiseLoader(url).then(function (object) {
+    if (!models[url]) models[url] = object;
+    return object;
+  });
 }
+
+// The exporter currently exports a scene object rather than just a single
+// mesh; traverse the loadedObject and find this mesh
+// const getMesh = (loadedObject) => {
+//   let mesh;
+//   loadedObject.traverse((object) => {
+//     if (object instanceof THREE.Mesh) {
+//       mesh = object;
+//       mesh.animations = loadedObject.animations;
+//     }
+//   });
+//
+//   if (mesh === undefined) {
+//     console.warn(`${url} does not contain a THREE.Mesh.`);
+//   }
+//   return mesh;
+// };
 
 //hold a reference to all drawings so that they can be reset easily
 var drawings = {};
@@ -787,6 +829,7 @@ var Drawing = function () {
 
     this.initCamera();
     this.initScene();
+    this.initRenderer();
 
     this.init();
   }
@@ -834,8 +877,11 @@ var Drawing = function () {
     this.scene = new THREE.Scene();
 
     this.scene.add(this.camera);
+  };
 
+  Drawing.prototype.initRenderer = function initRenderer() {
     this.renderer = new Renderer(this.rendererSpec, this.scene, this.camera);
+    this.domElement = this.renderer.renderer.domElement;
   };
 
   Drawing.prototype.initCamera = function initCamera() {
@@ -891,7 +937,7 @@ var Drawing = function () {
 
   Drawing.prototype.reset = function reset() {
     this.clearScene();
-    this.camera.set();
+    this.initCamera();
     this.renderer.setSize();
     this.init();
   };
@@ -911,10 +957,12 @@ var Drawing = function () {
   };
 
   Drawing.prototype.addPostShader = function addPostShader(shader, uniforms, renderToScreen) {
+    if (!this.rendererSpec.postprocessing) return;
     this.scene.renderer.postRenderer.addShader(shader, uniforms, renderToScreen);
   };
 
   Drawing.prototype.addPostEffect = function addPostEffect(effect, renderToScreen) {
+    if (!this.rendererSpec.postprocessing) return;
     this.scene.renderer.postRenderer.addEffect(effect, renderToScreen);
   };
 
@@ -929,9 +977,11 @@ var Drawing = function () {
   Drawing.prototype.loadObject = function loadObject(url, callback) {
     var _this = this;
 
-    if (callback === undefined) callback = function (object) {
-      _this.add(object);
-    };
+    if (callback === undefined) {
+      callback = function (object) {
+        return _this.add(object);
+      };
+    }
     return objectLoader(url, callback);
   };
 
@@ -942,15 +992,31 @@ var Drawing = function () {
   Drawing.prototype.initMixer = function initMixer() {
     var _this2 = this;
 
+    this.mixer = new THREE.AnimationMixer(this.scene);
+
     this.initClock();
 
-    if (!this.mixer) this.mixer = new THREE.AnimationMixer(this.scene);
-
-    this.addPerFrameFunction(function () {
-      _this2.mixer.update(_this2.clock.getDelta());
-    });
+    if (this.rendererSpec.useGSAP === false) {
+      this.addPerFrameFunction(function () {
+        return _this2.mixer.update(_this2.clock.getDelta());
+      });
+    } else {
+      TweenLite.ticker.addEventListener('tick', function () {
+        return _this2.mixer.update(_this2.clock.getDelta());
+      });
+    }
   };
 
+  createClass(Drawing, [{
+    key: 'animationMixer',
+    get: function () {
+      if (!this.mixer) {
+        this.initMixer();
+      }
+
+      return this.mixer;
+    }
+  }]);
   return Drawing;
 }();
 
@@ -967,4 +1033,6 @@ var modularTHREE = {
   loadingManager: null
 };
 
-export default modularTHREE;
+return modularTHREE;
+
+})));

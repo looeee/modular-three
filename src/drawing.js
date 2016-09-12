@@ -1,6 +1,5 @@
 import throttle from 'lodash-es/throttle';
 import { Renderer } from './renderer';
-import { Camera } from './camera';
 import { objectLoader } from './loaders/objectLoader';
 
 //hold a reference to all drawings so that they can be reset easily
@@ -31,8 +30,9 @@ export class Drawing {
 
     this.perFrameFunctions = [];
 
-    this.initCamera()
+    this.initCamera();
     this.initScene();
+    this.initRenderer();
 
     this.init();
   }
@@ -71,12 +71,15 @@ export class Drawing {
     this.scene = new THREE.Scene();
 
     this.scene.add(this.camera);
+  }
 
+  initRenderer() {
     this.renderer = new Renderer(this.rendererSpec, this.scene, this.camera);
+    this.domElement = this.renderer.renderer.domElement;
   }
 
   initCamera() {
-    if(!this.camera) {
+    if (!this.camera) {
       if (this.cameraSpec.type === 'PerspectiveCamera') {
         this.camera = new THREE.PerspectiveCamera();
       }
@@ -111,7 +114,7 @@ export class Drawing {
   //object dimensions
   reset() {
     this.clearScene();
-    this.camera.set();
+    this.initCamera();
     this.renderer.setSize();
     this.init();
   }
@@ -131,10 +134,12 @@ export class Drawing {
   }
 
   addPostShader(shader, uniforms, renderToScreen) {
+    if (!this.rendererSpec.postprocessing) return;
     this.scene.renderer.postRenderer.addShader(shader, uniforms, renderToScreen);
   }
 
   addPostEffect(effect, renderToScreen) {
+    if (!this.rendererSpec.postprocessing) return;
     this.scene.renderer.postRenderer.addEffect(effect, renderToScreen);
   }
 
@@ -149,23 +154,35 @@ export class Drawing {
 
 
   loadObject(url, callback) {
-    if (callback === undefined) callback = (object) => {
-      this.add(object);
+    if (callback === undefined) {
+      callback = (object) => this.add(object);
     }
     return objectLoader(url, callback);
   }
 
   initClock() {
-    if(!this.clock) this.clock = new THREE.Clock();
+    if (!this.clock) this.clock = new THREE.Clock();
+  }
+
+  get animationMixer() {
+    if (!this.mixer) {
+      this.initMixer();
+    }
+
+    return this.mixer;
   }
 
   initMixer() {
+    this.mixer = new THREE.AnimationMixer(this.scene);
+
     this.initClock();
 
-    if (!this.mixer) this.mixer = new THREE.AnimationMixer(this.scene);
+    if (this.rendererSpec.useGSAP === false) {
+      this.addPerFrameFunction(() => this.mixer.update(this.clock.getDelta()));
+    }
 
-    this.addPerFrameFunction(() => {
-      this.mixer.update(this.clock.getDelta());
-    });
+    else {
+      TweenLite.ticker.addEventListener('tick', () => this.mixer.update(this.clock.getDelta()));
+    }
   }
 }

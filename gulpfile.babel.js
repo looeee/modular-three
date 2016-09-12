@@ -27,7 +27,7 @@ gulp.task('bundle', () => {
   })
     .then((bundle) => {
       return bundle.write({
-        format: 'es',
+        format: 'umd',
         moduleName: 'modularTHREE',
         dest: 'dist/index.js',
       });

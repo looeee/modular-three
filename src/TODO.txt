@@ -1,18 +1,6 @@
-Loaders
- - textureLoader
-  - add updateTexture()
- - test obj loader
- - test adding random loaders
-
-renderer, camera, scene
+renderer
  - add methods for setting all options
 
-controls
- - add control methods
+Add dat gui
 
-commonjs bundle
-
-Move Scene functions to Drawing Class
-
-object loader
-  enumerate and test with object types
+loader - convert to promise

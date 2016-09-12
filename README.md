@@ -381,10 +381,28 @@ As you can see ```addPostShader()``` has an optional second argument in which yo
 
 Nothing will have happened yet, as we haven't set ```rendererSpec.postprocessing = true;```. Do this now, and while you're at it set ```rendererSpec.clearColor = 0x6858bb;``` so that you can see the postprocessing effects more clearly.
 
-#### Using custom loaders with the THREE.LoadingManager ####
+#### Loading JSON objects with THREE.ObjectLoader ####
+We'll load a precreated version of the crate object in the [THREE JSON](https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4) format - ModularTHREE uses the [THREE.ObjectLoader](http://threejs.org/docs/index.html?q=load#Reference/Loaders/ObjectLoader)
 
-Forthcoming...
+Copy these two files into the same directory in your project:
+[**crate.jpg**](https://raw.githubusercontent.com/looeee/modular-three-boilerplate/master/models/crate/crate.jpg) and [**crate.json**](https://raw.githubusercontent.com/looeee/modular-three-boilerplate/master/models/crate/crate.json).
 
+
+#### Using other loaders ####
+
+There are loaders for [**many 3d file formats**](http://threejs.org/docs/index.html?q=loader) available for THREE.js. However you will probably need to include additional script files to use them.
+
+In general if possible it's recommended to convert your model to the THREE JSON format. One method that works well is to save your model in a format that [Clara.io](https://clara.io) supports (ideally .FBX as you can embed textures in this format). Upload your file there, perform any final tweaks and then export as Three.js (json). Both ```export all``` and ```export selected``` export an entire scene - this is generally not an issue when loading the model, but you should be aware of it.
+
+If you do use another loading manager, be aware that it may not be written to interface with the ```THREE.loadingManager```. For example, the [BabylonLoader](http://threejs.org/docs/index.html?q=loader#Reference/Loaders/BabylonLoader) does, but the [ColladaLoader](http://threejs.org/docs/index.html?q=loader#Reference/Loaders/ColladaLoader) does not.
+
+If it does support the loadingManager, make sure you set ```modularTHREE.config.useLoadingManager = true;``` and run ```modularTHREE.init();``` before initialising the loader (as described above), which for the BabylonLoader you would do like so:
+
+```js
+  const babylonLoader = new THREE.BabylonLoader(modularTHREE.loadingManager);
+```
+
+After this use the loader as described in its documentation.
 
 #### License MIT © Lewy Blue 2016 ####
 
