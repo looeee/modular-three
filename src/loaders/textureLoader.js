@@ -8,15 +8,26 @@ let loader = null;
 
 const textures = {};
 
-export function textureLoader(url) {
+const initLoader = () => {
   if (!loader) {
     if (modularTHREE.config.useLoadingManager) {
       loader = new THREE.TextureLoader(modularTHREE.loadingManager);
     }
     else loader = new THREE.TextureLoader();
   }
+}
 
-  if (!textures[url]) textures[url] = loader.load(url);
+const promiseLoader = (url) => new Promise((resolve, reject) => {
+  if (!textures[url]) loader.load(url, resolve);
+  else resolve(textures[url]);
+});
 
-  return textures[url];
+export function textureLoader(url) {
+  initLoader();
+
+  return promiseLoader(url)
+  .then((texture) => {
+    if (!textures[url]) textures[url] = texture;
+    return texture;
+  });
 }
