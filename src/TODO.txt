@@ -3,4 +3,4 @@ renderer
 
 Add dat gui
 
-loader - convert to promise
+add TOC to readme
