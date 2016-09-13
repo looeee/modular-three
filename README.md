@@ -1,3 +1,29 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+  - [Installation](#installation)
+  - [Requirements](#requirements)
+  - [Optional Addons](#optional-addons)
+      - [**GSAP** for animation / tweening.](#gsap-for-animation--tweening)
+      - [**Stats**](#stats)
+  - [Usage](#usage)
+    - [Preliminary Setup](#preliminary-setup)
+      - [Creating a drawing](#creating-a-drawing)
+    - [```rendererSpec``` and ```cameraSpec```](#rendererspec-and-cameraspec)
+    - [Adding Objects to the Drawing](#adding-objects-to-the-drawing)
+    - [Adding Animation](#adding-animation)
+    - [Using **GSAP** for Animation](#using-gsap-for-animation)
+    - [Loading JSON objects with THREE.ObjectLoader](#loading-json-objects-with-threeobjectloader)
+    - [Playing keyframe animations from loaded JSON objects](#playing-keyframe-animations-from-loaded-json-objects)
+    - [Playing morph animations from loaded JSON objects](#playing-morph-animations-from-loaded-json-objects)
+    - [Playing skinned animations from loaded JSON objects](#playing-skinned-animations-from-loaded-json-objects)
+    - [Using other loaders](#using-other-loaders)
+    - [Using pre-built controls](#using-pre-built-controls)
+    - [Postprocessing](#postprocessing)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ModularTHREE [![NPM version][npm-image]][npm-url]
 ========
 
@@ -377,7 +403,7 @@ Now the cube animation will play on a loop. Unfortunately ```THREE.AnimationMixe
 
 ...forthcoming
 
-### Playing skin animations from loaded JSON objects ###
+### Playing skinned animations from loaded JSON objects ###
 
 ...forthcoming
 
