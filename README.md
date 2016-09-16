@@ -1,25 +1,24 @@
 ModularTHREE [![NPM version][npm-image]][npm-url]
 ========
 
-ModularTHREE simplifies the creation of [**THREE.js**](http://threejs.org/) based [**WebGL**](https://en.wikipedia.org/wiki/WebGL) scenes written in **ES2015**. In particular it handles:
+**ModularTHREE** simplifies the creation of [Three.js] based [WebGL] scenes written in [ES2015]. In particular it handles:
 
 * Basic scene setup with intelligent defaults
-* Resizing your scene when the window is resized
+* Resizing your scene on window resize
 * [Memoization](https://en.wikipedia.org/wiki/Memoization) of scene assets such as models and textures
 
-**ModularTHREE** is designed to be used with build tools such as Rollup, Babel etc, however it should work fine if you use the old method of including ```<script>``` files in your ```<head>```.
+**ModularTHREE** is designed to be used with build tools such as [Rollup], [Babel] etc, however it should work fine if you use the old method of including ```<script>``` files in your ```<head>```.
 
-To see it in action check out [**Modular THREE Boilerplate**](https://github.com/looeee/modular-three-boilerplate),
-which includes a [Gulp](http://gulpjs.com/) setup for compiling ES2015 with
-[Rollup](http://rollupjs.org/) and [Babel](https://babeljs.io/),
+To see it in action check out [Modular THREE Boilerplate],
+which includes a [Gulp] setup for compiling ES2015 with
+[Rollup] and [Babel](https://babeljs.io/),
 as well as compiling and [autoprefixing](https://github.com/postcss/autoprefixer)
 [SCSS](http://sass-lang.com/) and piping through [Livereload](http://livereload.com/)
 to be used with [Chrome](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei)
 or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/livereload/) livereload
 plugins.
 
-
-### NOTE: This is a very early build. Features are changing rapidly and this readme may be out of date. You probably shouldn't use this yet. ###
+### NOTE: This is an early build. Features may change rapidly. ###
 
 ### Table of Contents ###
 
@@ -83,14 +82,22 @@ Usage
 
 ### Preliminary Setup ###
 
-**NOTE:** The following instructions are heavily biased to using [Rollup](http://rollupjs.org/) and [Babel](https://babeljs.io/) as build tools. Rollup will require the ```rollup-plugin-node-resolve``` and ```rollup-plugin-commonjs``` plugins to allow importing of THREE, GSAP and other npm modules. See [**Modular THREE Boilerplate**](https://github.com/looeee/modular-three-boilerplate) for a ready to go build setup. If you don't use a build tool or use different ones you will need to make some adjustments.
+**NOTE:** The following instructions largely assume you are working with [ModularTHREE Boilerplate]. You may have to make minor adjustments if you are using yor own setup.
 
-If your are using THREE as an npm module, include it in any files that use it:
+Otherwise clone [modularTHREE Boilerplate] into an empty folder:
+
+```bash
+  git clone https://github.com/looeee/modular-three-boilerplate
+```
+
+and let's get started!
+
+If you do choose to use your own setup, you can use [Three.js] like so:
 ```js
 import THREE from 'three';
 ```
 
-Then include **modularTHREE** at the start of any files that use it like so:
+Then include **modularTHREE** at the start of any files:
 ```js
 import modularTHREE from 'modular-three';
 ```
@@ -105,7 +112,8 @@ import modularTHREE from 'modular-three';
 window.modularTHREE = modularTHREE;
 ```
 
-Next set config settings and call ```init()```:
+With that out of the way, let's get started on building our first scene.
+First, set config settings and call ```init()```:
 
 ```js
 modularTHREE.config.useLoadingManager = true;
@@ -120,9 +128,8 @@ THREE.js has recently (as of r80) switched to a modular build. This allows you t
 
 #### Creating a drawing ####
 
-The first step in using **modularTHREE** is to create a **Drawing**, which has a
-```THREE.Scene```, ```THREE.Camera``` and ```THREE.Renderer``` associated with
-a unique ```<canvas>``` element.
+The basic element in **modularTHREE** is a ```Drawing```, which has a
+```THREE.Scene```, ```THREE.Camera``` and ```THREE.Renderer``` associated with a unique ```<canvas>``` element.
 
 Create a class that extends ```modularTHREE.Drawing```:
 
@@ -165,7 +172,7 @@ const rendererSpec = {
   antialias: true,
   alpha: true, //true required for multiple scenes
   autoClear: true, //false required for multiple scenes
-  clearColor: 0x6858bb,
+  clearColor: 0x6858bb, //nice light purple background
   clearAlpha: 1.0,
   width: () => window.innerWidth,
   height: () => window.innerHeight,
@@ -234,7 +241,7 @@ class ExampleDrawing extends modularTHREE.Drawing {
 }
 ```
 
-And that's it! You should now have a small red cube in the middle of a black screen.
+And that's it! You should now have a small red cube in the middle of a purple screen.
 
 Let's make it a bit more interesting. We'll copy this example of a [**spinning wooden cube**]((http://threejs.org/examples/#webgl_geometry_cube)).
 
@@ -573,6 +580,12 @@ Nothing will have happened yet, as we haven't set ```rendererSpec.postprocessing
 
 #### License MIT © Lewy Blue 2016 ####
 
-
+[Three.js]: http://threejs.org/
+[WebGL]: https://en.wikipedia.org/wiki/WebGL
+[ES2015]: https://en.wikipedia.org/wiki/ECMAScript#6th_Edition_-_ECMAScript_2015
+[ModularTHREE Boilerplate]: https://github.com/looeee/modular-three-boilerplate
+[Gulp]: http://gulpjs.com/
+[Rollup]: http://rollupjs.org/
+[Babel]: https://babeljs.io/
 [npm-image]: https://badge.fury.io/js/modular-three.svg
 [npm-url]: https://npmjs.org/package/modular-three

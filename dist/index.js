@@ -21,19 +21,12 @@ var initLoader = function () {
   }
 };
 
-var promiseLoader = function (url) {
-  return new Promise(function (resolve, reject) {
-    if (!textures[url]) loader.load(url, resolve);else resolve(textures[url]);
-  });
-};
-
 function textureLoader(url) {
   initLoader();
 
-  return promiseLoader(url).then(function (texture) {
-    if (!textures[url]) textures[url] = texture;
-    return texture;
-  });
+  if (!textures[url]) textures[url] = loader.load(url);
+
+  return textures[url];
 }
 
 var classCallCheck = function (instance, Constructor) {
@@ -790,7 +783,7 @@ var setupLoader = function () {
   }
 };
 
-var promiseLoader$1 = function (url) {
+var promiseLoader = function (url) {
   return new Promise(function (resolve, reject) {
     if (!models[url]) loader$1.load(url, resolve);else resolve(models[url]);
   });
@@ -799,7 +792,7 @@ var promiseLoader$1 = function (url) {
 function objectLoader(url) {
   setupLoader();
 
-  return promiseLoader$1(url).then(function (object) {
+  return promiseLoader(url).then(function (object) {
     if (!models[url]) models[url] = object;
     return object;
   });
