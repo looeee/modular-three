@@ -124,7 +124,7 @@ modularTHREE.init();
 
 #### Important Note ####
 
-THREE.js has recently (as of r80) switched to a modular build. This allows you to include it with an import statement as above. However most of the plugins (stats being an exception) are not built as modules. This means you will need to include THREE first, then load any THREE plugins (e.g. postprocessing effects, controls etc.) as scripts, then finally load the script containing your code. It's not ideal, but hopefully this will change in the near future.
+THREE.js has recently (as of r80) switched to a modular build. This allows you to include it with an import statement as above (you can even just include the part of [Three.js] that you need, see [here](https://github.com/looeee/modular-three-spinning-cube/blob/master/src/vendorBundle.js) for an example of how to do that). However most of the plugins (stats being an exception) are not built as modules. This means you will need to include THREE first, then load any THREE plugins (e.g. postprocessing effects, controls etc.) as scripts, then finally load the script containing your code. It's not ideal as it means we need to include multiple scripts, instead of bundling everything together. Hopefully this will change in the near future.
 
 #### Creating a drawing ####
 
@@ -168,7 +168,7 @@ which have following options. If they are omitted the defaults shown will be use
 
 ```js
 const rendererSpec = {
-  canvasID: 'testDrawing',
+  canvasID: 'exampleDrawing',
   antialias: true,
   alpha: true, //true required for multiple scenes
   autoClear: true, //false required for multiple scenes
@@ -245,7 +245,7 @@ And that's it! You should now have a small red cube in the middle of a purple sc
 
 Let's make it a bit more interesting. We'll copy this example of a [**spinning wooden cube**]((http://threejs.org/examples/#webgl_geometry_cube)).
 
-First, copy the texture file [**crate.jpg**](https://github.com/looeee/modular-three-boilerplate/blob/master/images/textures/crate.jpg) into your project root - say into ```<project-root>/images/textures/crate.jpg```.
+First, copy the texture file [**crate.jpg**](https://raw.githubusercontent.com/looeee/modular-three-spinning-cube/master/images/textures/crate.jpg) into your project root - say into ```<project-root>/images/textures/crate.jpg```.
 
 Next update the ```Cube.init()``` function to use this texture:
 
@@ -266,11 +266,11 @@ Let's make the cube spin.
 
 The standard method of adding animation with THREE is to use [```window.requestAnimationFrame()```](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame), and update the objects we want to animate each frame. See the [**source code for the spinning cube**](http://threejs.org/examples/webgl_geometry_cube.html) for an example.
 
-To add a function which will be called every animationFrame to your drawing, call ```Drawing.addPerFrameFunction(yourFunction)```. Here is our testDrawing extended to make the cube rotate:
+To add a function which will be called every animationFrame to your drawing, call ```Drawing.addPerFrameFunction(yourFunction)```. Here is our exampleDrawing extended to make the cube rotate:
 
 
 ```js
-class TestDrawing extends modularTHREE.Drawing {
+class ExampleDrawing extends modularTHREE.Drawing {
   constructor() {
     super(rendererSpec, cameraSpec);
   }
@@ -298,12 +298,14 @@ class TestDrawing extends modularTHREE.Drawing {
 
 Your ```Drawing``` should now look pretty similar to the spinning cube example.
 
+The code up to this point is [here](https://github.com/looeee/modular-three-spinning-cube), and you can see it in action [here](https://looeee.github.io/modular-three-spinning-cube/).
+
 ### Using [**GSAP**](http://greensock.com/gsap) for Animation ###
 
 The above is fine for simple animations, however things will get messy quickly if you are trying to do anything complex. To switch to using [**GSAP**](http://greensock.com/gsap) to handle animations, set ```rendererSpec.useGSAP = true```. If you have correctly included the GSAP script,
 everything should be the same - the code will spin exactly as before, however you can now create GSAP timelines and tweens in your ```Drawing```.
 
-A deep exploration of GSAP is beyond the scope of this Readme, however the GSAP [**documentation**](https://greensock.com/docs) is thorough and [**this is a good place to start**](https://greensock.com/get-started-js). But let's create a simple falling animation for our cube using ```Timeline``` and ```TweenMax```. Extend your ```TestDrawing``` function like so:
+A deep exploration of GSAP is beyond the scope of this Readme, however the GSAP [**documentation**](https://greensock.com/docs) is thorough and [**this is a good place to start**](https://greensock.com/get-started-js). But let's create a simple falling animation for our cube using ```Timeline``` and ```TweenMax```. Extend your ```ExampleDrawing``` function like so:
 
 ```js
 initObjects() {
@@ -347,7 +349,7 @@ Next we'll add a simple play / pause functionality to our animation.
 
 Change the line ```this.cubeTimeline = new TimelineMax();``` to ```this.cubeTimeline = new TimelineMax({paused: true});``` so that the animations doesn't play automatically.
 
-Then add the following function to your ```TestDrawing``` class:
+Then add the following function to your ```ExampleDrawing``` class:
 
 ```js
 initCubeGUI() {
@@ -385,7 +387,7 @@ We'll load a precreated version of the crate object. This model was created in 3
 Copy these two files into the same directory in your project:
 [**crate.jpg**](https://raw.githubusercontent.com/looeee/modular-three-boilerplate/master/models/crate/crate.jpg) and [**crate.json**](https://raw.githubusercontent.com/looeee/modular-three-boilerplate/master/models/crate/crate.json).
 
-Next delete the ```initObjects()``` method from your ```TestDrawing``` class and create an ```initModels()``` method:
+Next delete the ```initObjects()``` method from your ```ExampleDrawing``` class and create an ```initModels()``` method:
 
 ```js
 initModels() {
@@ -491,7 +493,7 @@ For previewing your work, the ```OrbitControls``` are often the most useful, so 
 <script src="node_modules\three\examples\js\controls\OrbitControls.js"></script>
 ```
 
-Add an ```initControl()``` method to your ```TestDrawing``` class:
+Add an ```initControl()``` method to your ```ExampleDrawing``` class:
 
 ```js
   initControls() {
@@ -550,7 +552,7 @@ If you are not familiar with GLSL shader language, just think of these as option
 Update your ```Drawing``` class to include these:
 
 ```js
-class TestDrawing extends modularTHREE.Drawing {
+class ExampleDrawing extends modularTHREE.Drawing {
   constructor() {
     super(rendererSpec, cameraSpec);
   }
