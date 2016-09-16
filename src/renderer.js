@@ -53,11 +53,14 @@ export class Renderer {
     this.scene = scene;
     this.camera = camera;
     this.init();
+
   }
 
   init() {
     this.initRenderer();
     this.setRenderer();
+
+    this.initProperties();
 
     if (this.spec.showStats) this.initStats();
     if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, this.scene, this.camera);
@@ -84,6 +87,16 @@ export class Renderer {
     if (!this.spec.canvasID || !document.querySelector(`#${this.renderer.domElement.id}`)) {
       document.body.appendChild(this.renderer.domElement);
     }
+  }
+
+  //Copy over the properties from the renderer so that we can access them directly
+  initProperties() {
+    Object.keys(this.renderer).forEach((key) => {
+      //"render()" and "setSize()" are being handled here so don't copy them
+      if (key !== 'render' && key !== 'setSize') {
+        this[key] = this.renderer[key];
+      }
+    });
   }
 
   setSize(w = this.spec.width(), h = this.spec.height()) {

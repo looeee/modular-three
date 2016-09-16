@@ -655,6 +655,8 @@ var Renderer = function () {
     this.initRenderer();
     this.setRenderer();
 
+    this.initProperties();
+
     if (this.spec.showStats) this.initStats();
     if (this.spec.postprocessing) this.postRenderer = new Postprocessing(this.renderer, this.scene, this.camera);
   };
@@ -679,6 +681,20 @@ var Renderer = function () {
     if (!this.spec.canvasID || !document.querySelector('#' + this.renderer.domElement.id)) {
       document.body.appendChild(this.renderer.domElement);
     }
+  };
+
+  //Copy over the properties from the renderer so that we can access them directly
+
+
+  Renderer.prototype.initProperties = function initProperties() {
+    var _this = this;
+
+    Object.keys(this.renderer).forEach(function (key) {
+      //"render()" and "setSize()" are being handled here so don't copy them
+      if (key !== 'render' && key !== 'setSize') {
+        _this[key] = _this.renderer[key];
+      }
+    });
   };
 
   Renderer.prototype.setSize = function setSize() {
@@ -715,15 +731,15 @@ var Renderer = function () {
   };
 
   Renderer.prototype.animateWithGSAP = function animateWithGSAP(perFrameFunctions) {
-    var _this = this;
+    var _this2 = this;
 
     var renderHandler = function () {
       for (var i = 0; i < perFrameFunctions.length; i++) {
         perFrameFunctions[i]();
       }
 
-      if (_this.stats) _this.stats.update();
-      if (_this.postRenderer) _this.postRenderer.render();else _this.renderer.render(_this.scene, _this.camera);
+      if (_this2.stats) _this2.stats.update();
+      if (_this2.postRenderer) _this2.postRenderer.render();else _this2.renderer.render(_this2.scene, _this2.camera);
     };
 
     TweenLite.ticker.addEventListener('tick', renderHandler);
@@ -731,17 +747,17 @@ var Renderer = function () {
   };
 
   Renderer.prototype.animateWithTHREE = function animateWithTHREE(perFrameFunctions) {
-    var _this2 = this;
+    var _this3 = this;
 
     var renderHandler = function () {
-      _this2.animationFrame = requestAnimationFrame(renderHandler);
+      _this3.animationFrame = requestAnimationFrame(renderHandler);
 
       for (var i = 0; i < perFrameFunctions.length; i++) {
         perFrameFunctions[i]();
       }
 
-      if (_this2.stats) _this2.stats.update();
-      if (_this2.postRenderer) _this2.postRenderer.render();else _this2.renderer.render(_this2.scene, _this2.camera);
+      if (_this3.stats) _this3.stats.update();
+      if (_this3.postRenderer) _this3.postRenderer.render();else _this3.renderer.render(_this3.scene, _this3.camera);
     };
 
     renderHandler();

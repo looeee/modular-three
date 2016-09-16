@@ -15,7 +15,7 @@ const initLoader = () => {
     }
     else loader = new THREE.TextureLoader();
   }
-}
+};
 
 const promiseLoader = (url) => new Promise((resolve, reject) => {
   if (!textures[url]) loader.load(url, resolve);

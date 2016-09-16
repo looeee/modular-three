@@ -310,7 +310,7 @@ initObjects() {
   }
 
   initCubeAnimation() {
-    const cubeTimeline = new TimelineMax();
+    this.cubeTimeline = new TimelineMax();
 
     const cubeFallTween = TweenMax.to(this.cube.position, 3.5, {
       y: -20,
@@ -323,13 +323,49 @@ initObjects() {
       ease: Sine.easeInOut,
     });
 
-    cubeTimeline.add(cubeFallTween);
+    this.cubeTimeline.add(cubeFallTween);
 
-    //add the rotation tween at time 0 so that falling and rotating happen
-    //simultaneously
-    cubeTimeline.add(cubeRotateTween, 0);
+    //add the rotation tween at time 0 so that falling and rotating
+    //happen simultaneously
+    this.cubeTimeline.add(cubeRotateTween, 0);
   }
 ```
+
+### Adding Dat.GUI Controls ###
+[Dat.GUI](https://workshop.chromeexperiments.com/examples/gui/#1--Basic-Usage) is a usefull tool for adding controls to your models / animations during testing. You'll see it in use in many ```Three.js``` examples.
+
+To set it up, either include the script [```dat.gui.min.js```](https://raw.githubusercontent.com/dataarts/dat.gui/master/build/dat.gui.min.js) in your page, or ```npm install --save dat-gui``` and include it in your build.
+
+Next we'll add a simple play / pause functionality to our animation.
+
+Change the line ```this.cubeTimeline = new TimelineMax();``` to ```this.cubeTimeline = new TimelineMax({paused: true});``` so that the animations doesn't play automatically.
+
+Then add the following function to your ```TestDrawing``` class:
+
+```js
+initCubeGUI() {
+      //Prevent multiple copies of the gui being created (e.g. on window resize)
+    if (this.gui) return;
+
+    this.gui = new dat.GUI();
+
+    const opts = {
+      'play': () => {
+        this.cubeTimeline.play();
+      },
+      'stop': () => {
+        this.cubeTimeline.stop();
+      },
+    };
+
+    this.gui.add(opts, 'play');
+    this.gui.add(opts, 'stop');
+  }
+```
+
+And call the function **after** ```initCubeAnimation()```.
+
+For detailed instructions on using ```dat.GUI``` see the documentation [**here**](https://workshop.chromeexperiments.com/examples/gui/#1--Basic-Usage).
 
 ### Loading JSON objects with THREE.ObjectLoader ###
 In general you should try to convert any models to [THREE JSON](https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4) format, as this works best with Three. There are loaders for other 3d file formats (see below), but they are more difficuly to work with. ModularTHREE uses the [THREE.ObjectLoader](http://threejs.org/docs/index.html?q=load#Reference/Loaders/ObjectLoader), converted to a [**Promise**](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise). In simple terms this means whatever you would have put in a callback function you now chain with ```.then(callback());```
@@ -351,7 +387,7 @@ initModels() {
     this.cube = object.children[0];
 
     //scale the geometry to fit inside the unit sphere (sphere of radius 1)
-    this.cube.geometry.normalalize();
+    this.cube.geometry.normalize();
     this.cube.scale.set(20, 20, 20);
     this.cube.rotation.set(-2, 2, 0);
     this.cube.position.set(0, 30, 0);
@@ -369,8 +405,6 @@ initModels() {
 
 The ```crate.json``` file includes keyframe animations. We can play these using the ```THREE.AnimationMixer()```. To use these we'll have to use the whole loaded scene object (rather than extract the mesh object as above). Replace the ```initModels()``` and ```initCubeAnimation()``` methods with the following:
 
-
-
 ```js
 
 initModels() {
@@ -387,13 +421,35 @@ initModels() {
   });
 }
 
-cubeAnimation() {
+initCubeAnimation() {
   const cubeAnimationClip = this.cube.animations[0];
   this.animationMixer.clipAction(cubeAnimationClip).play();
 }
 ```
 
 Now the cube animation will play on a loop. Unfortunately ```THREE.AnimationMixer()``` is yet another undocumented part of ```THREE```, so exploration of the [**source files**](https://github.com/mrdoob/three.js/tree/dev/src/animation) is required to see how it works. ```ModularTHREE``` handles initialisation of the ```THREE.Clock()``` and the ```THREE.AnimationMixer()``` when you first use it.
+
+If you have set up ```dat.GUI``` to play / pause the animation change your ```initCubeGUI()```:
+
+```js
+initCubeGUI() {
+    //Prevent multiple copies of the gui being created (e.g. on window resize)
+    if (this.gui) return;
+    this.gui = new dat.GUI();
+
+    const opts = {
+      'play': () => {
+        this.animationMixer.clipAction(this.cubeAnimationClip).play();
+      },
+      'stop': () => {
+        this.animationMixer.clipAction(this.cubeAnimationClip).stop();
+      },
+    };
+
+    this.gui.add(opts, 'play');
+    this.gui.add(opts, 'stop');
+  }
+```
 
 ### Playing morph animations from loaded JSON objects ###
 

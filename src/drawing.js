@@ -152,7 +152,6 @@ export class Drawing {
     }
   }
 
-
   loadObject(url, callback) {
     if (callback === undefined) {
       callback = (object) => this.add(object);

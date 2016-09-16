@@ -1,6 +1,4 @@
 renderer
  - add methods for setting all options
 
-Add dat gui
-
-add TOC to readme
+Go over and test README
