@@ -1,4 +1,1 @@
-renderer
- - add methods for setting all options
-
 Go over and test README
