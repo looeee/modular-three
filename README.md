@@ -188,8 +188,8 @@ Note that ```alpha``` and ```autoClear``` **are** required if you are using mult
 ```js
 const cameraSpec = {
   type: 'PerspectiveCamera', //Or 'OrthographicCamera'
-  near: 10,
-  far: -10,
+  near: 1,
+  far: 1000,
   position: new THREE.Vector3(0, 0, 100),
   //PerspectiveCamera only
   fov: 45,
@@ -236,7 +236,7 @@ class ExampleDrawing extends modularTHREE.Drawing {
 
   init() {
     this.cube = new Cube();
-    this.scene.add(this.cube);
+    this.add(this.cube);
   }
 }
 ```
@@ -282,7 +282,7 @@ class ExampleDrawing extends modularTHREE.Drawing {
 
   initObjects() {
     this.cube = new Cube();
-    this.scene.add(this.cube);
+    this.add(this.cube);
   }
 
   initCubeAnimation() {
@@ -303,9 +303,22 @@ The code up to this point is [here](https://github.com/looeee/modular-three-spin
 ### Using [**GSAP**](http://greensock.com/gsap) for Animation ###
 
 The above is fine for simple animations, however things will get messy quickly if you are trying to do anything complex. To switch to using [**GSAP**](http://greensock.com/gsap) to handle animations, set ```rendererSpec.useGSAP = true```. If you have correctly included the GSAP script,
-everything should be the same - the code will spin exactly as before, however you can now create GSAP timelines and tweens in your ```Drawing```.
+everything should be the same - the code will spin exactly as before, however you are now controlling the render loop with GSAP ( internally this is done using ```TweenLite.ticker.addEventListener('tick', render);``` ).
 
-A deep exploration of GSAP is beyond the scope of this Readme, however the GSAP [**documentation**](https://greensock.com/docs) is thorough and [**this is a good place to start**](https://greensock.com/get-started-js). But let's create a simple falling animation for our cube using ```Timeline``` and ```TweenMax```. Extend your ```ExampleDrawing``` function like so:
+**Note**: There is nothing to stop you from continuing to use the standard method for calling your render loop while using GSAP - you can still create GSAP ```Timelines``` and ```Tweens```, and they will work just fine. Feel free to experiment with setting ```rendererSpec.useGSAP = true``` or ```rendererSpec.useGSAP = false```, and see which gives you better performance.
+
+A deep exploration of GSAP is beyond the scope of this Readme, however the GSAP [**documentation**](https://greensock.com/docs) is thorough and [**this is a good place to start**](https://greensock.com/get-started-js). But let's create a simple falling animation for our cube using ```TimelineLite``` and ```TweenLite```.
+
+We'll include just ```TimelineLite``` (which includes ```TweenLite```) and the ```EasePack``` plugins (to give a bouncing effect).
+
+If you have installed GSAP via npm, include them like this:
+
+```js
+import 'gsap/src/uncompressed/TimelineLite';
+import 'gsap/src/uncompressed/easing/EasePack';
+```
+
+ Extend your ```ExampleDrawing``` function like so:
 
 ```js
 initObjects() {
@@ -315,18 +328,18 @@ initObjects() {
     this.cube.rotation.set(-2, 2, 0);
     this.cube.position.set(0, 30, 0);
 
-    this.scene.add(this.cube);
+    this.add(this.cube);
   }
 
   initCubeAnimation() {
-    this.cubeTimeline = new TimelineMax();
+    this.cubeTimeline = new TimelineLite();
 
-    const cubeFallTween = TweenMax.to(this.cube.position, 3.5, {
+    const cubeFallTween = TweenLite.to(this.cube.position, 3.5, {
       y: -20,
       ease: Bounce.easeOut,
     });
 
-    const cubeRotateTween = TweenMax.to(this.cube.rotation, 3.5, {
+    const cubeRotateTween = TweenLite.to(this.cube.rotation, 3.5, {
       x: 0,
       y: 0,
       ease: Sine.easeInOut,
@@ -353,28 +366,37 @@ Then add the following function to your ```ExampleDrawing``` class:
 
 ```js
 initCubeGUI() {
-      //Prevent multiple copies of the gui being created (e.g. on window resize)
-    if (this.gui) return;
+  //Prevent multiple copies of the gui being created (e.g. on window resize)
+  if (this.gui) return;
 
-    this.gui = new dat.GUI();
+  this.gui = new dat.GUI();
 
-    const opts = {
-      'play': () => {
-        this.cubeTimeline.play();
-      },
-      'stop': () => {
-        this.cubeTimeline.stop();
-      },
-    };
+  const opts = {
+    play: () => {
+      this.cubeTimeline.play();
+    },
+    stop: () => {
+      this.cubeTimeline.stop();
+    },
+    reset: () => {
+      this.cubeTimeline.progress(0);
+    },
+    reverse: () => {
+      this.cubeTimeline.reverse();
+    },
+  };
 
-    this.gui.add(opts, 'play');
-    this.gui.add(opts, 'stop');
-  }
+  this.gui.add(opts, 'play');
+  this.gui.add(opts, 'stop');
+  this.gui.add(opts, 'reset');
+  this.gui.add(opts, 'reverse');
+}
 ```
 
 And call the function **after** ```initCubeAnimation()```.
 
-For detailed instructions on using ```dat.GUI``` see the documentation [**here**](https://workshop.chromeexperiments.com/examples/gui/#1--Basic-Usage).
+For detailed instructions on using ```dat.GUI``` see the documentation [here](https://workshop.chromeexperiments.com/examples/gui/#1--Basic-Usage).
+You can see the code up to this point [here](https://github.com/looeee/modular-three-falling-cube-gsap) and you can see it in action [here](https://looeee.github.io/modular-three-falling-cube-gsap/).
 
 ### Loading JSON objects with THREE.ObjectLoader ###
 In general you should try to convert any models to [THREE JSON](https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4) format, as this works best with Three. There are loaders for other 3d file formats (see below), but they are more difficuly to work with. ModularTHREE uses the [THREE.ObjectLoader](http://threejs.org/docs/index.html?q=load#Reference/Loaders/ObjectLoader), converted to a [**Promise**](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise). In simple terms this means whatever you would have put in a callback function you now chain with ```.then(callback());```
@@ -383,6 +405,8 @@ At present many of the converters that THREE ships with (see [**here**](https://
 
 
 We'll load a precreated version of the crate object. This model was created in 3ds Max, saved as ```.FBX``` with embedded textures, then converted with [**Clara.io**](https://clara.io).
+
+**Note:** The material in this object was manually changed to a ```MeshBasicMaterial```. By default the exported material will probably be a ```MeshPhongMaterial```, which you will not be able to see unless you add some lights to your scene.
 
 Copy these two files into the same directory in your project:
 [**crate.jpg**](https://raw.githubusercontent.com/looeee/modular-three-boilerplate/master/models/crate/crate.jpg) and [**crate.json**](https://raw.githubusercontent.com/looeee/modular-three-boilerplate/master/models/crate/crate.json).
@@ -401,7 +425,7 @@ initModels() {
     this.cube.rotation.set(-2, 2, 0);
     this.cube.position.set(0, 30, 0);
 
-    this.scene.add(this.cube);
+    this.add(this.cube);
 
     //Note that we must now call initCubeAnimation() inside .then()
     //i.e. after the object has loaded
@@ -425,7 +449,7 @@ initModels() {
     this.cube.scale.set(15, 15, 15);
     this.cube.position.set(30, -5, 0);
 
-    this.scene.add(this.cube);
+    this.add(this.cube);
     this.cubeAnimation();
   });
 }

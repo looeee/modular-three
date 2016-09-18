@@ -53,8 +53,8 @@ export class Drawing {
 
   initCameraSpec() {
     if (this.cameraSpec.type === undefined) this.cameraSpec.type = 'PerspectiveCamera';
-    if (this.cameraSpec.near === undefined) this.cameraSpec.near = 10;
-    if (this.cameraSpec.far === undefined) this.cameraSpec.far = -10;
+    if (this.cameraSpec.near === undefined) this.cameraSpec.near = 1;
+    if (this.cameraSpec.far === undefined) this.cameraSpec.far = 1000;
     if (this.cameraSpec.position === undefined) this.cameraSpec.position = new THREE.Vector3(0, 0, 100);
 
     if (this.cameraSpec.type === 'PerspectiveCamera') {
