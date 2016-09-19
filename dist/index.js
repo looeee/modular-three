@@ -839,22 +839,22 @@ var Drawing = function () {
 
     this.rendererSpec = rendererSpec || {};
     this.cameraSpec = cameraSpec || {};
-    this.initRendererSpec();
-    this.initCameraSpec();
+    this._initRendererSpec();
+    this._initCameraSpec();
 
     this.uuid = THREE.Math.generateUUID();
     drawings[this.uuid] = this;
 
     this.perFrameFunctions = [];
 
-    this.initCamera();
-    this.initScene();
-    this.initRenderer();
+    this._initCamera();
+    this._initScene();
+    this._initRenderer();
 
-    this.init();
+    if (typeof this.init === 'function') this.init();
   }
 
-  Drawing.prototype.initRendererSpec = function initRendererSpec() {
+  Drawing.prototype._initRendererSpec = function _initRendererSpec() {
     if (this.rendererSpec.showStats === undefined) this.rendererSpec.showStats = false;
     if (this.rendererSpec.useGSAP === undefined) this.rendererSpec.useGSAP = false;
     if (this.rendererSpec.postprocessing === undefined) this.rendererSpec.postprocessing = false;
@@ -872,10 +872,10 @@ var Drawing = function () {
     if (this.rendererSpec.pixelRatio === undefined) this.rendererSpec.pixelRatio = window.devicePixelRatio;
   };
 
-  Drawing.prototype.initCameraSpec = function initCameraSpec() {
+  Drawing.prototype._initCameraSpec = function _initCameraSpec() {
     if (this.cameraSpec.type === undefined) this.cameraSpec.type = 'PerspectiveCamera';
-    if (this.cameraSpec.near === undefined) this.cameraSpec.near = 10;
-    if (this.cameraSpec.far === undefined) this.cameraSpec.far = -10;
+    if (this.cameraSpec.near === undefined) this.cameraSpec.near = 1;
+    if (this.cameraSpec.far === undefined) this.cameraSpec.far = 1000;
     if (this.cameraSpec.position === undefined) this.cameraSpec.position = new THREE.Vector3(0, 0, 100);
 
     if (this.cameraSpec.type === 'PerspectiveCamera') {
@@ -893,18 +893,18 @@ var Drawing = function () {
     }
   };
 
-  Drawing.prototype.initScene = function initScene() {
+  Drawing.prototype._initScene = function _initScene() {
     this.scene = new THREE.Scene();
 
     this.scene.add(this.camera);
   };
 
-  Drawing.prototype.initRenderer = function initRenderer() {
+  Drawing.prototype._initRenderer = function _initRenderer() {
     this.renderer = new Renderer(this.rendererSpec, this.scene, this.camera);
     this.domElement = this.renderer.renderer.domElement;
   };
 
-  Drawing.prototype.initCamera = function initCamera() {
+  Drawing.prototype._initCamera = function _initCamera() {
     if (!this.camera) {
       if (this.cameraSpec.type === 'PerspectiveCamera') {
         this.camera = new THREE.PerspectiveCamera();

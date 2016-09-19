@@ -22,22 +22,22 @@ export class Drawing {
   constructor(rendererSpec, cameraSpec) {
     this.rendererSpec = rendererSpec || {};
     this.cameraSpec = cameraSpec || {};
-    this.initRendererSpec();
-    this.initCameraSpec();
+    this._initRendererSpec();
+    this._initCameraSpec();
 
     this.uuid = THREE.Math.generateUUID();
     drawings[this.uuid] = this;
 
     this.perFrameFunctions = [];
 
-    this.initCamera();
-    this.initScene();
-    this.initRenderer();
+    this._initCamera();
+    this._initScene();
+    this._initRenderer();
 
-    this.init();
+    if (typeof this.init === 'function') this.init();
   }
 
-  initRendererSpec() {
+  _initRendererSpec() {
     if (this.rendererSpec.showStats === undefined) this.rendererSpec.showStats = false;
     if (this.rendererSpec.useGSAP === undefined) this.rendererSpec.useGSAP = false;
     if (this.rendererSpec.postprocessing === undefined) this.rendererSpec.postprocessing = false;
@@ -51,7 +51,7 @@ export class Drawing {
     if (this.rendererSpec.pixelRatio === undefined) this.rendererSpec.pixelRatio = window.devicePixelRatio;
   }
 
-  initCameraSpec() {
+  _initCameraSpec() {
     if (this.cameraSpec.type === undefined) this.cameraSpec.type = 'PerspectiveCamera';
     if (this.cameraSpec.near === undefined) this.cameraSpec.near = 1;
     if (this.cameraSpec.far === undefined) this.cameraSpec.far = 1000;
@@ -67,18 +67,18 @@ export class Drawing {
     }
   }
 
-  initScene() {
+  _initScene() {
     this.scene = new THREE.Scene();
 
     this.scene.add(this.camera);
   }
 
-  initRenderer() {
+  _initRenderer() {
     this.renderer = new Renderer(this.rendererSpec, this.scene, this.camera);
     this.domElement = this.renderer.renderer.domElement;
   }
 
-  initCamera() {
+  _initCamera() {
     if (!this.camera) {
       if (this.cameraSpec.type === 'PerspectiveCamera') {
         this.camera = new THREE.PerspectiveCamera();
