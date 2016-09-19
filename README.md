@@ -530,6 +530,12 @@ Add an ```initControl()``` method to your ```ExampleDrawing``` class:
   this.addPerFrameFunction(() => {
     this.orbitControls.update();
   });
+
+  //set the lookAt target about which the camera will rotate
+  this.orbitControls.target.set(0, 0, 0);
+
+  //Finally update the controls once so the camera is in the correct position; this
+  //will prevent 'jumping' at the start
 }
 ```
 
