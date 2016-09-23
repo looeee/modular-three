@@ -114,7 +114,7 @@ export class Drawing {
   //object dimensions
   reset() {
     this.clearScene();
-    this.initCamera();
+    this._initCamera();
     this.renderer.setSize();
     this.init();
   }

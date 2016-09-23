@@ -957,7 +957,7 @@ var Drawing = function () {
 
   Drawing.prototype.reset = function reset() {
     this.clearScene();
-    this.initCamera();
+    this._initCamera();
     this.renderer.setSize();
     this.init();
   };
