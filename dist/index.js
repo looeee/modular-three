@@ -519,7 +519,6 @@ var warnIfConfigUpdatedAfterInit = function () {
 
 var config = {
   initCalled: false,
-
   loadingManager: false,
   get useLoadingManager() {
     return this.loadingManager;
@@ -527,7 +526,8 @@ var config = {
   set useLoadingManager(value) {
     if (this.initCalled) warnIfConfigUpdatedAfterInit();
     this.loadingManager = value;
-  }
+  },
+  texturePath: ''
 };
 
 // *****************************************************************************
@@ -781,6 +781,7 @@ var setupLoader = function () {
       loader$1 = new THREE.ObjectLoader(modularTHREE.loadingManager);
     } else loader$1 = new THREE.ObjectLoader();
   }
+  loader$1.setTexturePath(modularTHREE.config.texturePath);
 };
 
 var promiseLoader = function (url) {
@@ -791,9 +792,9 @@ var promiseLoader = function (url) {
 
 function objectLoader(url) {
   setupLoader();
-
   return promiseLoader(url).then(function (object) {
     if (!models[url]) models[url] = object;
+
     return object;
   });
 }

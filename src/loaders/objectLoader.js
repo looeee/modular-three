@@ -16,6 +16,7 @@ const setupLoader = () => {
     }
     else loader = new THREE.ObjectLoader();
   }
+  loader.setTexturePath(modularTHREE.config.texturePath);
 };
 
 const promiseLoader = (url) => new Promise((resolve, reject) => {
@@ -25,10 +26,10 @@ const promiseLoader = (url) => new Promise((resolve, reject) => {
 
 export function objectLoader(url) {
   setupLoader();
-
   return promiseLoader(url)
   .then((object) => {
     if (!models[url]) models[url] = object;
+
     return object;
   });
 }

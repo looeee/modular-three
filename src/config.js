@@ -4,7 +4,6 @@ const warnIfConfigUpdatedAfterInit = () => {
 
 export const config = {
   initCalled: false,
-
   loadingManager: false,
   get useLoadingManager() {
     return this.loadingManager;
@@ -13,4 +12,5 @@ export const config = {
     if (this.initCalled) warnIfConfigUpdatedAfterInit();
     this.loadingManager = value;
   },
+  texturePath: '',
 };
