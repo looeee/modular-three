@@ -1,5 +1,7 @@
-ModularTHREE [![NPM version][npm-image]][npm-url]
+ModularTHREE (DEPRECATED [![NPM version][npm-image]][npm-url]
 ========
+
+# This app has been deprecated. Please use [three-app](https://www.npmjs.com/package/three-app) instead.
 
 **ModularTHREE** simplifies the creation of [Three.js] based [WebGL] scenes written in [ES2015]. In particular it handles:
 
@@ -17,8 +19,6 @@ as well as compiling and [autoprefixing](https://github.com/postcss/autoprefixer
 to be used with [Chrome](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei)
 or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/livereload/) livereload
 plugins.
-
-### NOTE: This is an early build. Features may change rapidly. ###
 
 ### Table of Contents ###
 
